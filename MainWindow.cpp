@@ -261,9 +261,9 @@ MainWindow::draw()
 		}
 		if (gate1->get_input_gate2() != nullptr)
 		{
-			if (gate1->get_gate_type() == Gate::NOT)
+			if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
 			{
-				/* NOT,NOR,OUTPUT need a special case */
+				/* NOT,OUTPUT need a special case */
 				continue;
 
 			}
@@ -271,7 +271,7 @@ MainWindow::draw()
 			{
 
 			dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
-					gate1->get_x()+10, gate1->get_y()+47);
+					gate1->get_x()+10, gate1->get_y()+43);
 			}
 		}
 
