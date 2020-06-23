@@ -102,15 +102,15 @@ MainWindow::create_ui()
 	NOT_icon = new FXGIFIcon(app, NOT_icon_data, IMAGE_KEEP);
 
 	/* tools */
-	new FXButton(toolsFrame, "", INPUT_icon, this, MainWindow::ID_BUTTON_INPUT, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", OR_icon, this, MainWindow::ID_BUTTON_OR, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", NOR_icon, this, MainWindow::ID_BUTTON_NOR, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL);
-	new FXButton(toolsFrame, "", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL);
+	new FXButton(toolsFrame, "", INPUT_icon, this, MainWindow::ID_BUTTON_INPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "AND", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "NAND", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "OR", OR_icon, this, MainWindow::ID_BUTTON_OR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "NOR", NOR_icon, this, MainWindow::ID_BUTTON_NOR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "XOR", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "XNOR", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "NOT", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL|LAYOUT_FILL_X);
 }
 
 void
