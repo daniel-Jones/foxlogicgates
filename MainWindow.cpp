@@ -33,7 +33,11 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_INPUT, MainWindow::input_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_OUTPUT, MainWindow::output_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_AND, MainWindow::and_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NAND, MainWindow::nand_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_OR, MainWindow::or_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NOR, MainWindow::nor_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XOR, MainWindow::xor_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XNOR, MainWindow::xnor_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NOT, MainWindow::not_button_press),
 };
 FXIMPLEMENT(MainWindow, FXMainWindow, MainWindow_Map, ARRAYNUMBER(MainWindow_Map))
@@ -56,7 +60,11 @@ MainWindow::create()
 	INPUT_icon->create();
 	OUTPUT_icon->create();
 	AND_icon->create();
+	NAND_icon->create();
 	OR_icon->create();
+	NOR_icon->create();
+	XOR_icon->create();
+	XNOR_icon->create();
 	NOT_icon->create();
 	canvas_image->create();
 	show(PLACEMENT_SCREEN);
@@ -66,7 +74,7 @@ void
 MainWindow::create_ui()
 {
 	contents=new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	toolsFrame = new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
+	toolsFrame = new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP, 0, 0, 0, 0, 10, 10, 10, 10);
 
 	canvasFrame=new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
 
@@ -86,14 +94,22 @@ MainWindow::create_ui()
 	INPUT_icon = new FXGIFIcon(app, INPUT_icon_data, IMAGE_KEEP);
 	OUTPUT_icon = new FXGIFIcon(app, OUTPUT_icon_data, IMAGE_KEEP);
 	AND_icon = new FXGIFIcon(app, AND_icon_data, IMAGE_KEEP);
+	NAND_icon = new FXGIFIcon(app, NAND_icon_data, IMAGE_KEEP);
 	OR_icon = new FXGIFIcon(app, OR_icon_data, IMAGE_KEEP);
+	NOR_icon = new FXGIFIcon(app, NOR_icon_data, IMAGE_KEEP);
+	XOR_icon = new FXGIFIcon(app, XOR_icon_data, IMAGE_KEEP);
+	XNOR_icon = new FXGIFIcon(app, XNOR_icon_data, IMAGE_KEEP);
 	NOT_icon = new FXGIFIcon(app, NOT_icon_data, IMAGE_KEEP);
 
 	/* tools */
 	new FXButton(toolsFrame, "", INPUT_icon, this, MainWindow::ID_BUTTON_INPUT, BUTTON_NORMAL);
 	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL);
 	new FXButton(toolsFrame, "", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL);
+	new FXButton(toolsFrame, "", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL);
 	new FXButton(toolsFrame, "", OR_icon, this, MainWindow::ID_BUTTON_OR, BUTTON_NORMAL);
+	new FXButton(toolsFrame, "", NOR_icon, this, MainWindow::ID_BUTTON_NOR, BUTTON_NORMAL);
+	new FXButton(toolsFrame, "", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL);
+	new FXButton(toolsFrame, "", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL);
 	new FXButton(toolsFrame, "", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL);
 }
 
@@ -106,13 +122,19 @@ MainWindow::draw()
 	dc_image.fillRectangle(canvas->getX(), canvas->getY(), canvas->getWidth(), canvas->getHeight());
 	dc_image.setForeground(FXRGB(0,0,0));
 
-	/* draw gates */
 	Gate *gate1;
+
+	/* update every gate */
 	for(auto g1 = gates.begin(); g1 != gates.end(); ++g1)
 	{
 		gate1 = (*g1).get();
-		if (gate1)
-			gate1->update_state();
+		gate1->update_state();
+	}
+
+	/* draw gates */
+	for(auto g1 = gates.begin(); g1 != gates.end(); ++g1)
+	{
+		gate1 = (*g1).get();
 		switch(gate1->get_gate_type())
 		{
 			case Gate::INPUT:
@@ -148,12 +170,43 @@ MainWindow::draw()
 				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "AND");
 				break;
 			}
+
+			case Gate::NAND:
+			{
+				dc_image.drawIcon(NAND_icon, gate1->get_x(), gate1->get_y());
+				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NAND");
+				break;
+			}
+
 			case Gate::OR:
 			{
 				dc_image.drawIcon(OR_icon, gate1->get_x(), gate1->get_y());
 				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "OR");
 				break;
 			}
+
+			case Gate::NOR:
+			{
+				dc_image.drawIcon(NOR_icon, gate1->get_x(), gate1->get_y());
+				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NOR");
+				break;
+			}
+
+			case Gate::XOR:
+			{
+				dc_image.drawIcon(XOR_icon, gate1->get_x(), gate1->get_y());
+				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "XOR");
+				break;
+			}
+
+			case Gate::XNOR:
+			{
+				dc_image.drawIcon(XNOR_icon, gate1->get_x(), gate1->get_y());
+				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "XNOR");
+				break;
+			}
+
+
 			case Gate::NOT:
 			{
 				dc_image.drawIcon(NOT_icon, gate1->get_x(), gate1->get_y());
@@ -176,7 +229,10 @@ MainWindow::draw()
 	/* draw dragging link */
 	if (dragging_link && selected_gate)
 	{
-		dc_image.drawLine(selected_gate->get_x()+selected_gate->get_width()-5, selected_gate->get_y()+selected_gate->get_height()/2-2, mouse_x, mouse_y);
+		FXint mousex, mousey;
+		FXuint mbuttons;
+		canvas->getCursorPosition(mousex, mousey, mbuttons);
+		dc_image.drawLine(selected_gate->get_x()+selected_gate->get_width()-5, selected_gate->get_y()+selected_gate->get_height()/2-2, mousex, mousey);
 	}
 
 	/* draw links */
@@ -190,9 +246,9 @@ MainWindow::draw()
 			continue;
 		if (gate1->get_input_gate1() != nullptr)
 		{
-			if (gate1->get_gate_type() == Gate::NOT|| gate1->get_gate_type() == Gate::NOR || gate1->get_gate_type() == Gate::OUTPUT)
+			if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
 			{
-				/* NOT,NOR,OUTPUT need a special case */
+				/* NOT,OUTPUT need a special case */
 				dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
 						gate1->get_x()+10, gate1->get_y()+(gate1->get_height()/2));
 
@@ -321,6 +377,8 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 	{
 		Gate *gate;
 		gate = find_gate_at(ev->last_x, ev->last_y);
+		if (gate == selected_gate) /* gates cannot connect to themselves, probably */
+			return 1;
 		if (gate)
 		{
 			int input = -1;
@@ -328,7 +386,7 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 				input = 1;
 			else
 				input = 2;
-			if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::NOR && gate->get_gate_type() != Gate::OUTPUT)
+			if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() && gate->get_gate_type() != Gate::OUTPUT)
 			{
 				printf("connecting gate %d with gate %d at input #%d\n", selected_gate->get_id(), gate->get_id(), input);
 				if (input == 1)
@@ -368,9 +426,9 @@ MainWindow::on_right_mouse_down(FXObject*, FXSelector, void *ptr)
 		{
 			/* toggle state */
 			gate->set_state(!gate->get_output_state());
-			draw();
 		}
 	}
+	draw();
 
 	return 1;
 }
@@ -413,15 +471,14 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 long
 MainWindow::on_mouse_move(FXObject *sender, FXSelector sel, void *ptr)
 {
-	FXEvent* event = (FXEvent*)ptr;
-	mouse_x = event->last_x;
-	mouse_y = event->last_y;
 	if (lmouse_down && !dragging_link && selected_gate)
 	{
+		FXEvent* event = (FXEvent*)ptr;
 		selected_gate->set_x(event->last_x-selected_gate->get_width()/2);
 		selected_gate->set_y(event->last_y-selected_gate->get_height()/2);
 	}
-	draw();
+	if (lmouse_down)
+		draw();
 	return 1;
 }
 
@@ -450,12 +507,46 @@ MainWindow::and_button_press(FXObject *sender, FXSelector sel, void *ptr)
 }
 
 long
+MainWindow::nand_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	selected_gate = nullptr;
+	selected_gate_type = Gate::NAND;
+	return 1;
+}
+
+long
 MainWindow::or_button_press(FXObject *sender, FXSelector sel, void *ptr)
 {
 	selected_gate = nullptr;
 	selected_gate_type = Gate::OR;
 	return 1;
 }
+
+long
+MainWindow::xor_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	selected_gate = nullptr;
+	selected_gate_type = Gate::XOR;
+	return 1;
+}
+
+long
+MainWindow::nor_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	selected_gate = nullptr;
+	selected_gate_type = Gate::NOR;
+	return 1;
+}
+
+long
+MainWindow::xnor_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	puts("xnor");
+	selected_gate = nullptr;
+	selected_gate_type = Gate::XNOR;
+	return 1;
+}
+
 
 long
 MainWindow::not_button_press(FXObject *sender, FXSelector sel, void *ptr)

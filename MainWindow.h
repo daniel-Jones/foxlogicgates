@@ -44,7 +44,11 @@ class MainWindow : public FXMainWindow
 			ID_BUTTON_INPUT,
 			ID_BUTTON_OUTPUT,
 			ID_BUTTON_AND,
+			ID_BUTTON_NAND,
 			ID_BUTTON_OR,
+			ID_BUTTON_NOR,
+			ID_BUTTON_XOR,
+			ID_BUTTON_XNOR,
 			ID_BUTTON_NOT,
 		};
 
@@ -60,7 +64,11 @@ class MainWindow : public FXMainWindow
 		long input_button_press(FXObject*,FXSelector,void* ptr);
 		long output_button_press(FXObject*,FXSelector,void* ptr);
 		long and_button_press(FXObject*,FXSelector,void* ptr);
+		long nand_button_press(FXObject*,FXSelector,void* ptr);
 		long or_button_press(FXObject*,FXSelector,void* ptr);
+		long nor_button_press(FXObject*,FXSelector,void* ptr);
+		long xor_button_press(FXObject*,FXSelector,void* ptr);
+		long xnor_button_press(FXObject*,FXSelector,void* ptr);
 		long not_button_press(FXObject*,FXSelector,void* ptr);
 		
 		/* selected gate */
@@ -82,6 +90,7 @@ class MainWindow : public FXMainWindow
 		FXVerticalFrame   *canvasFrame;
 		FXVerticalFrame   *toolsFrame;
 		FXScrollWindow 	*scroll_area;
+		FXScrollWindow 	*toolbox_scroll_area;
 		FXCanvas *canvas;
 		FXBMPImage *canvas_image;
 		FXApp *app;
@@ -90,14 +99,22 @@ class MainWindow : public FXMainWindow
 		FXGIFIcon *INPUT_icon;
 		FXGIFIcon *OUTPUT_icon;
 		FXGIFIcon *AND_icon;
+		FXGIFIcon *NAND_icon;
 		FXGIFIcon *OR_icon;
+		FXGIFIcon *NOR_icon;
+		FXGIFIcon *XOR_icon;
+		FXGIFIcon *XNOR_icon;
 		FXGIFIcon *NOT_icon;
 
 		/* buttons */
 		FXButton *INPUT_button;
 		FXButton *OUTPUT_button;
 		FXButton *AND_button;
+		FXButton *NAND_button;
 		FXButton *OR_button;
+		FXButton *NOR_button;
+		FXButton *XOR_button;
+		FXButton *XNOR_button;
 		FXButton *NOT_button;
 
 		Gate::GATE_TYPE selected_gate_type = Gate::NONE; // the type of gate we will place
@@ -106,8 +123,6 @@ class MainWindow : public FXMainWindow
 		bool lmouse_down = false;
 		bool rmouse_down = false;
 		bool dragging_link = false;
-		int mouse_x;
-		int mouse_y;
 
 		/* keyboard */
 		bool lshift_down = false;

@@ -85,7 +85,7 @@ void Gate::update_state()
 		case NAND:
 		{
 			if (!input_gate1 || !input_gate2) {this->output_state = false; return; }
-			output_state = ~(input_gate1->get_output_state() & input_gate2->get_output_state());
+			output_state = !(input_gate1->get_output_state() & input_gate2->get_output_state());
 			break;
 		}
 
@@ -93,7 +93,7 @@ void Gate::update_state()
 		case NOR:
 		{
 			if (!input_gate1 || !input_gate2) {this->output_state = false; return; }
-			output_state = ~(input_gate1->get_output_state() | input_gate2->get_output_state());
+			output_state = !(input_gate1->get_output_state() | input_gate2->get_output_state());
 			break;
 		}
 
@@ -109,7 +109,7 @@ void Gate::update_state()
 		case XNOR:
 		{
 			if (!input_gate1 || !input_gate2) {this->output_state = false; return; }
-			output_state = ~(input_gate1->get_output_state() ^ input_gate2->get_output_state());
+			output_state = !(input_gate1->get_output_state() ^ input_gate2->get_output_state());
 			break;
 		}
 
