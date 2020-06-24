@@ -365,13 +365,11 @@ MainWindow::update_gate_state(Gate *gate)
 	gate->update_state();
 	/* update all gates that are using this gate as an input */
 	Gate *gate2;
-	printf("out gate size: %ld\n", gate->get_output_gates()->size());
 	for(auto g = gate->get_output_gates()->begin(); g != gate->get_output_gates()->end(); ++g)
 	{
 		 gate2 = find_gate_by_id((*g));
 		 if (gate2)
 		 {
-			 printf("updating gate %p from gate %p\n", gate2, gate);
 			 update_gate_state(gate2);
 		 }
 	}
@@ -411,7 +409,6 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 			{
 				dragging_link = true;
 			}
-			//gate->update_state();
 			update_gate_state(gate);
 		}
 		else
@@ -464,10 +461,8 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 					gate->set_input_gate1(selected_gate);
 				}
 			}
-			//selected_gate->set_output_gate(gate);
 			selected_gate->add_output_gate_id(gate->get_id());
 			printf("adding output gate");
-			//gate->update_state();
 			update_gate_state(gate);
 		}
 		dragging_link = false;
@@ -488,9 +483,8 @@ MainWindow::on_right_mouse_down(FXObject*, FXSelector, void *ptr)
 			/* toggle state */
 			gate->set_state(!gate->get_output_state());
 		}
-	}
-		//gate->update_state();
 		update_gate_state(gate);
+	}
 	draw();
 
 	return 1;
