@@ -604,6 +604,7 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 		{
 			if (selected_input.gate != nullptr)
 			{
+				/* delete link */
 				switch (selected_input.input)
 				{
 					case 1:
@@ -622,8 +623,59 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 				selected_input.input = -1;
 				draw();
 			}
+			else if (selected_gate)
+			{
+				/* delete gate and all associations */
+				/*
+				 * 2 inputs
+				 * x outputs
+				 *
+				 * inputs:
+				 * 	if input1/2 != null:
+				 * 		call their remove_gate_id with this gate id
+				 * 		update that gate
+				 * outputs:
+				 * 	iterate through ouputs
+				 *	call remove_input_gate with this gate id
+				 *	update that gate
+				 */
+				Gate *gate;
+				/* delete inputs */
+				if (selected_gate->get_input_gate1())
+				{
+					selected_gate->get_input_gate1()->remove_output_gate_id(selected_gate->get_id());
+					update_gate_state(selected_gate->get_input_gate1());
+				}
+				if (selected_gate->get_input_gate2())
+				{
+					selected_gate->get_input_gate2()->remove_output_gate_id(selected_gate->get_id());
+					update_gate_state(selected_gate->get_input_gate2());
+				}
+
+				/* delete outputs */
+				for(auto g = selected_gate->get_output_gates()->begin(); g != selected_gate->get_output_gates()->end(); ++g)
+				{
+					gate = find_gate_by_id((*g));
+					if (!gate)
+						continue;
+					gate->remove_input_gate(selected_gate->get_id());
+					update_gate_state(gate);
+				}
+				int pos = 0;
+				for (auto g = gates.begin(); g != gates.end(); ++g)
+				{
+					gate = (*g).get();
+					if (gate->get_id() == selected_gate->get_id())
+					{
+						gates.erase(gates.begin() + pos);
+						break;
+					}
+					pos++;
+				}
+			}
 			break;
 		}
+
 		default:
 			this->onKeyPress(sender, sel, ptr);
 			break;

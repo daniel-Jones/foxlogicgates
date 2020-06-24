@@ -40,11 +40,26 @@ Gate::remove_output_gate_id(int id)
 	{
 		if (id == (*g))
 		{
-			printf("%id = %d\n", id, *g);
 			output_gate_ids.erase(output_gate_ids.begin() + pos);
 			break;
 		}
 		pos++;
+	}
+}
+
+void
+Gate::remove_input_gate(int id)
+{
+	if (input_gate1)
+	{
+		if (input_gate1->get_id() == id)
+			input_gate1 = nullptr;
+	}
+
+	if (input_gate2)
+	{
+		if (input_gate2->get_id() == id)
+			input_gate2 = nullptr;
 	}
 }
 

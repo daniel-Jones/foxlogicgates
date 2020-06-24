@@ -59,6 +59,7 @@ class Gate
 		//void set_output_gate(Gate *gate) { this->output_gate = gate; };
 		void add_output_gate_id(int id) { this->output_gate_ids.push_back(id); };
 		void remove_output_gate_id(int id);
+		void remove_input_gate(int id);
 		void update_state();
 
 	private:
