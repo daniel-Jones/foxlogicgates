@@ -12,7 +12,7 @@ Click on a gates input to highlight that particular link, press the delete key t
 
 Right-click on an input to toggle it on and off.
 
-# install
+# build
 You need the FOX toolkit installed. On arch install the 'fox' package.
 ```
 cmake CmakeLists.txt
