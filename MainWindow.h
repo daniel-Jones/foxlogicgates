@@ -31,6 +31,11 @@
 class MainWindow : public FXMainWindow
 {
 	FXDECLARE(MainWindow)
+	struct selected_input
+	{
+		Gate *gate;
+		int input;
+	};
 
 	public:
 		explicit MainWindow(FXApp* a);
@@ -84,6 +89,7 @@ class MainWindow : public FXMainWindow
 		void create_ui();
 		void draw();
 		void update_gate_state(Gate *gate);
+		void find_selected_input(int x, int y);
 		Gate *find_gate_at(int x, int y);
 		Gate *find_gate_by_id(int id);
 
@@ -128,6 +134,7 @@ class MainWindow : public FXMainWindow
 		FXButton *NOT_button;
 
 		Gate::GATE_TYPE selected_gate_type = Gate::NONE; // the type of gate we will place
+		struct selected_input selected_input;
 
 		/* mouse */
 		bool lmouse_down = false;
@@ -139,6 +146,7 @@ class MainWindow : public FXMainWindow
 
 		/* general */
 		std::vector<std::unique_ptr<Gate>> gates;
+
 };
 
 #endif // MAINWINDOW_H

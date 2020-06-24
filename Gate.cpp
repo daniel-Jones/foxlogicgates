@@ -40,7 +40,9 @@ Gate::remove_output_gate_id(int id)
 	{
 		if (id == (*g))
 		{
+			printf("%id = %d\n", id, *g);
 			output_gate_ids.erase(output_gate_ids.begin() + pos);
+			break;
 		}
 		pos++;
 	}
@@ -63,7 +65,7 @@ void Gate::update_state()
 			{
 				this->output_state = true;
 			}
-			else if (input_gate1)
+			else
 			{
 				this->output_state = false;
 			}

@@ -43,7 +43,7 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 FXIMPLEMENT(MainWindow, FXMainWindow, MainWindow_Map, ARRAYNUMBER(MainWindow_Map))
 
 MainWindow::MainWindow(FXApp *a)
-	: FXMainWindow(a, "foxboxes", nullptr, nullptr, DECOR_ALL, 0, 0, 500, 500)
+	: FXMainWindow(a, "foxlogicgates", nullptr, nullptr, DECOR_ALL, 0, 0, 500, 500)
 {
 	app = a;
 	create_ui();
@@ -129,7 +129,7 @@ MainWindow::create_ui()
 	input_2_details = new FXLabel(input2_frame, "", NULL, JUSTIFY_CENTER_X);
 	input_2_details->setText("(None)");
 
-	new FXLabel(output_state_frame, "Output state: ", NULL, JUSTIFY_CENTER_X);
+	new FXLabel(output_state_frame, "Output: ", NULL, JUSTIFY_CENTER_X);
 	output_details = new FXLabel(output_state_frame, "", NULL, JUSTIFY_CENTER_X);
 	output_details->setText("(None)");
 }
@@ -177,7 +177,7 @@ MainWindow::draw()
 			{
 				if (gate1->get_output_state() == true)
 				{
-					/* output ison, indicate so */
+					/* output is on, indicate so */
 					dc_image.setForeground(FXRGB(255, 255, 0));
 					dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
 					dc_image.setForeground(FXRGB(0,0,0));
@@ -269,21 +269,33 @@ MainWindow::draw()
 			continue;
 		if (gate1->get_input_gate1() != nullptr)
 		{
+			if (in_gate1 == selected_input.gate)
+			{
+				dc_image.setForeground(FXRGB(255, 0, 0));
+			}
+
 			if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
 			{
 				/* NOT,OUTPUT need a special case */
 				dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
 						gate1->get_x()+10, gate1->get_y()+(gate1->get_height()/2));
+				dc_image.setForeground(FXRGB(0, 0, 0));
 
 			}
 			else
 			{
 				dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
 						gate1->get_x()+10, gate1->get_y()+7);
+				dc_image.setForeground(FXRGB(0, 0, 0));
 			}
 		}
 		if (gate1->get_input_gate2() != nullptr)
 		{
+			if (in_gate2 == selected_input.gate)
+			{
+				dc_image.setForeground(FXRGB(255, 0, 0));
+			}
+
 			if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
 			{
 				/* NOT,OUTPUT need a special case */
@@ -293,11 +305,12 @@ MainWindow::draw()
 			else
 			{
 
-			dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
+				dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
 					gate1->get_x()+10, gate1->get_y()+43);
+				dc_image.setForeground(FXRGB(0, 0, 0));
 			}
 		}
-
+			dc_image.setForeground(FXRGB(0, 0, 0));
 
 	}
 
@@ -376,6 +389,62 @@ MainWindow::update_gate_state(Gate *gate)
 
 }
 
+void
+MainWindow::find_selected_input(int x, int y)
+{
+	Gate *input_gate = nullptr;
+	if (!selected_gate)
+	{
+		selected_input.gate = nullptr;
+		selected_input.input = -1;
+		return;
+	}
+	int input = -1;
+
+	if (x >= selected_gate->get_x() && x <= selected_gate->get_x() + 20)
+	{
+		if (y-selected_gate->get_y() <= selected_gate->get_height()/2)
+		{
+			input = 1;
+		}
+		else
+		{
+			input = 2;
+		}
+
+		switch (input)
+		{
+			case 1:
+			{
+				if (selected_gate->get_input_gate1() != nullptr)
+				{
+					input_gate = selected_gate->get_input_gate1();
+				}
+				break;
+			}
+
+			case 2:
+			{
+				if (selected_gate->get_input_gate2() != nullptr)
+				{
+					input_gate = selected_gate->get_input_gate2();
+				}
+				break;
+			}
+
+			default:
+				input = -1;
+				break;
+		}
+		if (input_gate != nullptr)
+		{
+			selected_input.gate = input_gate;
+			selected_input.input = input;
+			printf("selected input #%d of gate id %d\n", input, selected_gate->get_id());
+		}
+	}
+}
+
 long
 MainWindow::on_paint(FXObject*, FXSelector, void *ptr)
 {
@@ -400,6 +469,8 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 	else
 	{
 		/* do other things */
+
+		/* get gate at cursor */
 		gate = find_gate_at(ev->last_x, ev->last_y);
 		if (gate)
 		{
@@ -414,8 +485,19 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 		else
 		{
 			selected_gate = nullptr;
+			selected_input.gate = nullptr;
+			selected_input.input = -1;
 		}
-		
+
+		if (selected_gate)
+		{
+			/* check if the user clicked on an input and select it */
+			find_selected_input(ev->last_x, ev->last_y);
+			if (selected_input.gate != nullptr)
+			{
+				/* an input is selected */
+			}
+		}
 	}
 	draw();
 	return 1;
@@ -462,7 +544,6 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 				}
 			}
 			selected_gate->add_output_gate_id(gate->get_id());
-			printf("adding output gate");
 			update_gate_state(gate);
 		}
 		dragging_link = false;
@@ -517,6 +598,30 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 			lshift_down = false;
 			dragging_link = false;
 			break;
+		case KEY_Delete:
+		{
+			if (selected_input.gate != nullptr)
+			{
+				switch (selected_input.input)
+				{
+					case 1:
+						selected_gate->get_input_gate1()->remove_output_gate_id(selected_gate->get_id());
+						selected_gate->set_input_gate1(nullptr);
+						break;
+					case 2:
+						selected_gate->get_input_gate2()->remove_output_gate_id(selected_gate->get_id());
+						selected_gate->set_input_gate2(nullptr);
+						break;
+					default: break;
+				}
+				update_gate_state(selected_gate);
+				update_gate_state(selected_input.gate);
+				selected_input.gate = nullptr;
+				selected_input.input = -1;
+				draw();
+			}
+			break;
+		}
 		default:
 			this->onKeyPress(sender, sel, ptr);
 			break;
@@ -603,7 +708,6 @@ MainWindow::xnor_button_press(FXObject *sender, FXSelector sel, void *ptr)
 	selected_gate_type = Gate::XNOR;
 	return 1;
 }
-
 
 long
 MainWindow::not_button_press(FXObject *sender, FXSelector sel, void *ptr)
