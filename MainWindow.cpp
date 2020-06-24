@@ -111,6 +111,27 @@ MainWindow::create_ui()
 	new FXButton(toolsFrame, "XOR", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "XNOR", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "NOT", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL|LAYOUT_FILL_X);
+
+	optionsFrame = new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP, 0, 0, 0, 0, 10, 10, 10, 10);
+	new FXLabel(optionsFrame, "Options", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
+	new FXHorizontalSeparator(optionsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
+
+	input1_frame = new FXHorizontalFrame(optionsFrame, LAYOUT_SIDE_TOP);
+	input2_frame = new FXHorizontalFrame(optionsFrame, LAYOUT_SIDE_TOP);
+	output_state_frame = new FXHorizontalFrame(optionsFrame, LAYOUT_SIDE_TOP);
+
+
+	new FXLabel(input1_frame, "Input 1: ", NULL, JUSTIFY_CENTER_X);
+	input_1_details = new FXLabel(input1_frame, "", NULL, JUSTIFY_CENTER_X);
+	input_1_details->setText("(None)");
+
+	new FXLabel(input2_frame, "Input 2: ", NULL, JUSTIFY_CENTER_X);
+	input_2_details = new FXLabel(input2_frame, "", NULL, JUSTIFY_CENTER_X);
+	input_2_details->setText("(None)");
+
+	new FXLabel(output_state_frame, "Output state: ", NULL, JUSTIFY_CENTER_X);
+	output_details = new FXLabel(output_state_frame, "", NULL, JUSTIFY_CENTER_X);
+	output_details->setText("(None)");
 }
 
 void
@@ -278,6 +299,20 @@ MainWindow::draw()
 
 	}
 
+	/* update options panel */
+	if (selected_gate)
+	{
+		input_1_details->setText((selected_gate->get_input_gate1() ? selected_gate->get_input_gate1()->get_output_type_text().c_str() : "(None)"));
+		input_2_details->setText((selected_gate->get_input_gate2() ? selected_gate->get_input_gate2()->get_output_type_text().c_str() : "(None)"));
+		output_details->setText(selected_gate->get_output_state() ? "ON" : "OFF");
+	}
+	else
+	{
+		input_1_details->setText("(None)");
+		input_2_details->setText("(None)");
+		output_details->setText("(None)");
+	}
+
 	FXDCWindow dc_canvas(canvas);
 	dc_canvas.drawImage(canvas_image, 0, 0);
 }
@@ -356,6 +391,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 			{
 				dragging_link = true;
 			}
+			gate->update_state();
 		}
 		else
 		{
@@ -407,7 +443,8 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 					gate->set_input_gate1(selected_gate);
 				}
 			}
-			selected_gate->set_output_gate(gate);
+			//selected_gate->set_output_gate(gate);
+			gate->update_state();
 		}
 		dragging_link = false;
 	}
@@ -428,6 +465,7 @@ MainWindow::on_right_mouse_down(FXObject*, FXSelector, void *ptr)
 			gate->set_state(!gate->get_output_state());
 		}
 	}
+		gate->update_state();
 	draw();
 
 	return 1;

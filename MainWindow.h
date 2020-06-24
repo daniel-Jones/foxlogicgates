@@ -89,11 +89,20 @@ class MainWindow : public FXMainWindow
 		FXHorizontalFrame *contents;
 		FXVerticalFrame   *canvasFrame;
 		FXVerticalFrame   *toolsFrame;
+		FXVerticalFrame   *optionsFrame;
 		FXScrollWindow 	*scroll_area;
 		FXScrollWindow 	*toolbox_scroll_area;
 		FXCanvas *canvas;
 		FXBMPImage *canvas_image;
 		FXApp *app;
+
+		FXHorizontalFrame *input1_frame;
+		FXHorizontalFrame *input2_frame;
+		FXHorizontalFrame *output_state_frame;
+
+		FXLabel *input_1_details;
+		FXLabel *input_2_details;
+		FXLabel *output_details;
 
 		/* icons */
 		FXGIFIcon *INPUT_icon;

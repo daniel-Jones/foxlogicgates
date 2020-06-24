@@ -22,7 +22,7 @@ Gate::Gate(GATE_TYPE type, int x, int y, int width, int height)
 	this->gate_type = type;
 	this->input_gate1 = nullptr;
 	this->input_gate2 = nullptr;
-	this->output_gate = nullptr;
+	//this->output_gate = nullptr;
 	this->id = Gate::gate_id_counter++; // increment counter after assigning
 	this->x = x;
 	this->y = y;
@@ -55,7 +55,6 @@ void Gate::update_state()
 			}
 			break;
 		}
-
 
 		case AND:
 		{
@@ -117,3 +116,67 @@ void Gate::update_state()
 			break;
 	}
 }
+std::string
+Gate::get_output_type_text()
+{
+	std::string out;
+	switch (this->gate_type)
+	{
+		case INPUT:
+		{
+			return "INPUT";
+		}
+
+		case OUTPUT:
+		{
+			return "OUTPUT";
+		}
+
+		case AND:
+		{
+			return "AND";
+		}
+
+
+		case OR:
+		{
+			return "OR";
+		}
+
+
+		case NOT:
+		{
+			return "NOT";
+		}
+
+
+		case NAND:
+		{
+			return "NAND";
+		}
+
+
+		case NOR:
+		{
+			return "NOR";
+		}
+
+
+		case XOR:
+		{
+			return "XOR";
+		}
+
+
+		case XNOR:
+		{
+			return "XNOR";
+		}
+
+		default:
+		return "?";
+	}
+
+}
+
+
