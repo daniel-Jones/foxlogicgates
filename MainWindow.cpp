@@ -435,6 +435,7 @@ MainWindow::find_selected_input(int x, int y)
 					if (selected_gate->get_gate_type() == Gate::NOT || selected_gate->get_gate_type() == Gate::OUTPUT)
 					{
 						input_gate = selected_gate->get_input_gate1();
+						input = 1;
 					}
 				}
 				break;
