@@ -83,6 +83,7 @@ class MainWindow : public FXMainWindow
 	private:
 		void create_ui();
 		void draw();
+		void update_gate_state(Gate *gate);
 		Gate *find_gate_at(int x, int y);
 		Gate *find_gate_by_id(int id);
 

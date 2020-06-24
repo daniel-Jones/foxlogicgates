@@ -32,6 +32,20 @@ Gate::Gate(GATE_TYPE type, int x, int y, int width, int height)
 
 Gate::~Gate() {}
 
+void
+Gate::remove_output_gate_id(int id)
+{
+	int pos = 0;
+	for(auto g = output_gate_ids.begin(); g != output_gate_ids.end(); ++g)
+	{
+		if (id == (*g))
+		{
+			output_gate_ids.erase(output_gate_ids.begin() + pos);
+		}
+		pos++;
+	}
+}
+
 void Gate::update_state()
 {
 	switch (this->gate_type)
@@ -116,6 +130,7 @@ void Gate::update_state()
 			break;
 	}
 }
+
 std::string
 Gate::get_output_type_text()
 {
@@ -176,7 +191,6 @@ Gate::get_output_type_text()
 		default:
 		return "?";
 	}
-
 }
 
 

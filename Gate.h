@@ -17,6 +17,7 @@
 #define GATE_H
 
 #include <string>
+#include <vector>
 
 class Gate
 {
@@ -44,6 +45,7 @@ class Gate
 		int get_width() { return this->w; };
 		int get_height() { return this->h; };
 		bool get_output_state() { return this->output_state; };
+		std::vector<int> *get_output_gates() { return &this->output_gate_ids; };
 		GATE_TYPE get_gate_type() { return this->gate_type; };
 		Gate *get_input_gate1() { return this->input_gate1; };
 		Gate *get_input_gate2() { return this->input_gate2; };
@@ -55,6 +57,8 @@ class Gate
 		void set_input_gate1(Gate *gate) { this->input_gate1 = gate; };
 		void set_input_gate2(Gate *gate) { this->input_gate2 = gate; };
 		//void set_output_gate(Gate *gate) { this->output_gate = gate; };
+		void add_output_gate_id(int id) { this->output_gate_ids.push_back(id); };
+		void remove_output_gate_id(int id);
 		void update_state();
 
 	private:
@@ -70,6 +74,7 @@ class Gate
 		Gate *input_gate1;
 		Gate *input_gate2;
 		//Gate *output_gate;
+		std::vector<int> output_gate_ids;
 
 		/* states */
 		bool output_state = false;
