@@ -458,6 +458,8 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 	FXEvent *ev = (FXEvent*)ptr;
 	lmouse_down = true;
 	Gate *gate = nullptr;
+	selected_input.gate = nullptr;
+	selected_input.input = -1;
 	if (selected_gate_type != Gate::NONE)
 	{
 		/* add new gate */
