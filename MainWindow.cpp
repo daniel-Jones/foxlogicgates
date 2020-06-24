@@ -429,6 +429,14 @@ MainWindow::find_selected_input(int x, int y)
 				{
 					input_gate = selected_gate->get_input_gate2();
 				}
+				else
+				{
+					/* special check for gates with only one input */
+					if (selected_gate->get_gate_type() == Gate::NOT || selected_gate->get_gate_type() == Gate::OUTPUT)
+					{
+						input_gate = selected_gate->get_input_gate1();
+					}
+				}
 				break;
 			}
 
@@ -625,20 +633,6 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 			}
 			else if (selected_gate)
 			{
-				/* delete gate and all associations */
-				/*
-				 * 2 inputs
-				 * x outputs
-				 *
-				 * inputs:
-				 * 	if input1/2 != null:
-				 * 		call their remove_gate_id with this gate id
-				 * 		update that gate
-				 * outputs:
-				 * 	iterate through ouputs
-				 *	call remove_input_gate with this gate id
-				 *	update that gate
-				 */
 				Gate *gate;
 				/* delete inputs */
 				if (selected_gate->get_input_gate1())
