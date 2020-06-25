@@ -27,6 +27,7 @@
 #include <fxkeys.h>
 #include "Gate.h"
 #include "icons.h"
+#include "pugixml.hpp" // saving/loading
 
 class MainWindow : public FXMainWindow
 {
@@ -55,6 +56,8 @@ class MainWindow : public FXMainWindow
 			ID_BUTTON_XOR,
 			ID_BUTTON_XNOR,
 			ID_BUTTON_NOT,
+
+			ID_BUTTON_SAVE,
 		};
 
 		/* Event handlers */
@@ -75,7 +78,10 @@ class MainWindow : public FXMainWindow
 		long xor_button_press(FXObject*,FXSelector,void* ptr);
 		long xnor_button_press(FXObject*,FXSelector,void* ptr);
 		long not_button_press(FXObject*,FXSelector,void* ptr);
-		
+
+		/* options */
+		long save_button_press(FXObject*,FXSelector,void* ptr);
+
 		/* selected gate */
 		Gate *selected_gate = nullptr;
 
@@ -92,6 +98,8 @@ class MainWindow : public FXMainWindow
 		void find_selected_input(int x, int y);
 		Gate *find_gate_at(int x, int y);
 		Gate *find_gate_by_id(int id);
+
+		bool save_file();
 
 		FXHorizontalFrame *contents;
 		FXVerticalFrame   *canvasFrame;
@@ -146,6 +154,9 @@ class MainWindow : public FXMainWindow
 
 		/* general */
 		std::vector<std::unique_ptr<Gate>> gates;
+
+		/* saving/loading */
+		std::string file_name = "";
 
 };
 

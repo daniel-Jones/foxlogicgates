@@ -5,10 +5,7 @@
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the * GNU General Public License for more details.  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,6 +36,9 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XOR, MainWindow::xor_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XNOR, MainWindow::xnor_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NOT, MainWindow::not_button_press),
+
+	/* options */
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_SAVE, MainWindow::save_button_press),
 };
 FXIMPLEMENT(MainWindow, FXMainWindow, MainWindow_Map, ARRAYNUMBER(MainWindow_Map))
 
@@ -132,6 +132,12 @@ MainWindow::create_ui()
 	new FXLabel(output_state_frame, "Output: ", NULL, JUSTIFY_CENTER_X);
 	output_details = new FXLabel(output_state_frame, "", NULL, JUSTIFY_CENTER_X);
 	output_details->setText("(None)");
+
+	new FXHorizontalSeparator(optionsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
+
+	/* save/load */
+	new FXLabel(optionsFrame, "Save", NULL, JUSTIFY_CENTER_X);
+	new FXButton(optionsFrame, "Save", nullptr, this, MainWindow::ID_BUTTON_SAVE, BUTTON_NORMAL|LAYOUT_FILL_X);
 }
 
 void
@@ -142,17 +148,9 @@ MainWindow::draw()
 	dc_image.setForeground(FXRGB(255, 255, 255));
 	dc_image.fillRectangle(canvas->getX(), canvas->getY(), canvas->getWidth(), canvas->getHeight());
 	dc_image.setForeground(FXRGB(0,0,0));
+	bool drawn_special_link = false;
 
 	Gate *gate1;
-
-	/* update every gate */
-	/*
-	for(auto g1 = gates.begin(); g1 != gates.end(); ++g1)
-	{
-		gate1 = (*g1).get();
-		gate1->update_state();
-	}
-	*/
 
 	/* draw gates */
 	for(auto g1 = gates.begin(); g1 != gates.end(); ++g1)
@@ -179,6 +177,7 @@ MainWindow::draw()
 				{
 					/* output is on, indicate so */
 					dc_image.setForeground(FXRGB(255, 255, 0));
+;
 					dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
 					dc_image.setForeground(FXRGB(0,0,0));
 				}
@@ -263,10 +262,10 @@ MainWindow::draw()
 	{
 		/* draw lines from input gate->output gate */
 		gate1 = (*g1).get();
-		Gate *in_gate1 = gate1->get_input_gate1();
-		Gate *in_gate2 = gate1->get_input_gate2();
 		if (!gate1)
 			continue;
+		Gate *in_gate1 = gate1->get_input_gate1();
+		Gate *in_gate2 = gate1->get_input_gate2();
 		if (gate1->get_input_gate1() != nullptr)
 		{
 			if (in_gate1 == selected_input.gate)
@@ -306,11 +305,11 @@ MainWindow::draw()
 			{
 
 				dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
-					gate1->get_x()+10, gate1->get_y()+43);
+						gate1->get_x()+10, gate1->get_y()+43);
 				dc_image.setForeground(FXRGB(0, 0, 0));
 			}
 		}
-			dc_image.setForeground(FXRGB(0, 0, 0));
+		dc_image.setForeground(FXRGB(0, 0, 0));
 
 	}
 
@@ -452,6 +451,85 @@ MainWindow::find_selected_input(int x, int y)
 			printf("selected input #%d of gate id %d\n", input, selected_gate->get_id());
 		}
 	}
+}
+
+bool
+MainWindow::save_file()
+{
+	FXString filename=FXFileDialog::getSaveFilename(this, "Save", "logicgates.xml", "XML files (*.xml)\nAll Files(*.*)"); 
+	if(!filename.empty())
+	{
+		file_name = filename.text();
+		printf("saving to %s\n", file_name.c_str());
+	}
+	else
+	{
+		/* cannot save */
+		return false;
+	}
+
+	/*
+	 * what we need to save:
+	 * Meta:
+	 * 	id for next created gate (we can just write the static variable gate_id_counter, it is incremented to the correct next gate id anyway)
+	 *
+	 * Gates:
+	 * 	id
+	 * 	x pos
+	 * 	y pos
+	 * 	width
+	 * 	height
+	 * 	gate_type (save as int?)
+	 *	input gate (we need the pointer, but we will save the id and make the pointer later)
+	 *	output gates (int vector of ids)
+	 *	output_state
+	 */
+	pugi::xml_document doc;
+	auto declarationNode = doc.append_child(pugi::node_declaration);
+	declarationNode.append_attribute("version")    = "1.0";
+	declarationNode.append_attribute("encoding")   = "ISO-8859-1";
+	declarationNode.append_attribute("standalone") = "yes";
+
+	/* write meta data */
+	auto meta = doc.append_child("Meta");
+	pugi::xml_node info_xml = meta.append_child("Info");
+	info_xml.append_attribute("next_id") = Gate::gate_id_counter;
+
+	auto root = doc.append_child("Gates");
+
+	/* iterate through all gates and add child nodes */
+	Gate *gate;
+	for (auto g = gates.begin(); g != gates.end(); ++g)
+	{
+		pugi::xml_node gate_xml = root.append_child("Gate");
+		gate = (*g).get();
+		gate_xml.append_attribute("id") = gate->get_id();
+		gate_xml.append_attribute("x") = gate->get_x();
+		gate_xml.append_attribute("y") = gate->get_y();
+		gate_xml.append_attribute("w") = gate->get_width();
+		gate_xml.append_attribute("h") = gate->get_height();
+		gate_xml.append_attribute("type") = gate->get_gate_type();
+		if (gate->get_input_gate1())
+			gate_xml.append_attribute("input1_id") = gate->get_input_gate1()->get_id();
+		if (gate->get_input_gate2())
+			gate_xml.append_attribute("input2_id") = gate->get_input_gate2()->get_id();
+		gate_xml.append_attribute("output_state") = gate->get_output_state();
+
+		/* iterate through all output gates and write them */
+		for(auto id = gate->get_output_gates()->begin(); id != gate->get_output_gates()->end(); ++id)
+		{
+			gate_xml.append_attribute("output_gate_id") = (*id);
+		}
+	}
+
+	bool saved = doc.save_file(file_name.c_str(), PUGIXML_TEXT("  "));
+
+	if (saved)
+		printf("saved to %s\n", file_name.c_str());
+	else
+		printf("could not save");
+
+	return true;
 }
 
 long
@@ -667,6 +745,7 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 					}
 					pos++;
 				}
+				selected_gate = nullptr;
 			}
 			break;
 		}
@@ -763,5 +842,12 @@ MainWindow::not_button_press(FXObject *sender, FXSelector sel, void *ptr)
 {
 	selected_gate = nullptr;
 	selected_gate_type = Gate::NOT;
+	return 1;
+}
+
+long
+MainWindow::save_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	save_file();
 	return 1;
 }

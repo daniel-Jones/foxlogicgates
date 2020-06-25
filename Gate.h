@@ -62,6 +62,8 @@ class Gate
 		void remove_input_gate(int id);
 		void update_state();
 
+		static int gate_id_counter; // used as the id of a new gate - this is NOT a count of the number of gates
+
 	private:
 		GATE_TYPE gate_type;
 		int id;
@@ -69,11 +71,11 @@ class Gate
 		int y;
 		int w;
 		int h;
-		static int gate_id_counter; // used as the id of a new gate - this is NOT a count of the number of gates
 
 		/* inputs/outputs */
 		Gate *input_gate1;
 		Gate *input_gate2;
+
 		//Gate *output_gate;
 		std::vector<int> output_gate_ids;
 
