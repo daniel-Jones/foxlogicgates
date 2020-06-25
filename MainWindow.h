@@ -58,6 +58,7 @@ class MainWindow : public FXMainWindow
 			ID_BUTTON_NOT,
 
 			ID_BUTTON_SAVE,
+			ID_BUTTON_LOAD,
 		};
 
 		/* Event handlers */
@@ -81,6 +82,7 @@ class MainWindow : public FXMainWindow
 
 		/* options */
 		long save_button_press(FXObject*,FXSelector,void* ptr);
+		long load_button_press(FXObject*,FXSelector,void* ptr);
 
 		/* selected gate */
 		Gate *selected_gate = nullptr;
@@ -98,8 +100,10 @@ class MainWindow : public FXMainWindow
 		void find_selected_input(int x, int y);
 		Gate *find_gate_at(int x, int y);
 		Gate *find_gate_by_id(int id);
+		void remove_all_gates();
 
 		bool save_file();
+		bool load_file();
 
 		FXHorizontalFrame *contents;
 		FXVerticalFrame   *canvasFrame;

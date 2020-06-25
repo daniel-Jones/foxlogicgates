@@ -36,7 +36,7 @@ class Gate
 			XNOR,
 		};
 
-		Gate(GATE_TYPE type = INPUT, int x = 0, int y = 0, int width = 70, int height = 50);
+		Gate(GATE_TYPE type = INPUT, int x = 0, int y = 0, int width = 70, int height = 50, int loaded_id = -1);
 		~Gate();
 
 		int get_id() { return this->id; }
@@ -62,7 +62,8 @@ class Gate
 		void remove_input_gate(int id);
 		void update_state();
 
-		static int gate_id_counter; // used as the id of a new gate - this is NOT a count of the number of gates
+		static void set_id_counter(int id) { gate_id_counter = id; };
+		static int get_id_counter() { return gate_id_counter; };
 
 	private:
 		GATE_TYPE gate_type;
@@ -71,6 +72,8 @@ class Gate
 		int y;
 		int w;
 		int h;
+
+		static int gate_id_counter; // used as the id of a new gate - this is NOT a count of the number of gates
 
 		/* inputs/outputs */
 		Gate *input_gate1;

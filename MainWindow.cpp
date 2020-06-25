@@ -39,6 +39,7 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 
 	/* options */
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_SAVE, MainWindow::save_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_LOAD, MainWindow::load_button_press),
 };
 FXIMPLEMENT(MainWindow, FXMainWindow, MainWindow_Map, ARRAYNUMBER(MainWindow_Map))
 
@@ -138,6 +139,8 @@ MainWindow::create_ui()
 	/* save/load */
 	new FXLabel(optionsFrame, "Save", NULL, JUSTIFY_CENTER_X);
 	new FXButton(optionsFrame, "Save", nullptr, this, MainWindow::ID_BUTTON_SAVE, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXLabel(optionsFrame, "Load", NULL, JUSTIFY_CENTER_X);
+	new FXButton(optionsFrame, "Load", nullptr, this, MainWindow::ID_BUTTON_LOAD, BUTTON_NORMAL|LAYOUT_FILL_X);
 }
 
 void
@@ -493,7 +496,7 @@ MainWindow::save_file()
 	/* write meta data */
 	auto meta = doc.append_child("Meta");
 	pugi::xml_node info_xml = meta.append_child("Info");
-	info_xml.append_attribute("next_id") = Gate::gate_id_counter;
+	info_xml.append_attribute("next_id") = Gate::get_id_counter();
 
 	auto root = doc.append_child("Gates");
 
@@ -518,11 +521,12 @@ MainWindow::save_file()
 		/* iterate through all output gates and write them */
 		for(auto id = gate->get_output_gates()->begin(); id != gate->get_output_gates()->end(); ++id)
 		{
-			gate_xml.append_attribute("output_gate_id") = (*id);
+			auto outid_node = gate_xml.append_child("output_gate_id");
+			outid_node.append_attribute("id") = (*id);
 		}
 	}
 
-	bool saved = doc.save_file(file_name.c_str(), PUGIXML_TEXT("  "));
+	bool saved = doc.save_file(file_name.c_str());
 
 	if (saved)
 		printf("saved to %s\n", file_name.c_str());
@@ -530,6 +534,123 @@ MainWindow::save_file()
 		printf("could not save");
 
 	return true;
+}
+
+bool
+MainWindow::load_file()
+{
+	FXString filename=FXFileDialog::getOpenFilename(this, "Open", "", "XML files (*.xml)\nAll Files(*.*)");
+	if(!filename.empty())
+	{
+		file_name = filename.text();
+		printf("loading from %s\n", file_name.c_str());
+	}
+	else
+	{
+		/* cannot load */
+		return false;
+	}
+
+	int next_gate_id = 0;
+	pugi::xml_document doc;
+	pugi::xml_parse_result result = doc.load_file(file_name.c_str(),
+			            pugi::parse_default|pugi::parse_declaration);
+	if (!result)
+	{
+		/* failed reading file */
+		return false;
+	}
+
+	remove_all_gates();
+
+	/* read meta info */
+	auto meta_objects = doc.child("Meta");
+	next_gate_id = meta_objects.child("Info").attribute("next_id").as_int();
+	printf("next gate id after loading is: %d\n", next_gate_id);
+
+	/* read gates */
+	auto node_objects = doc.child("Gates");
+	for (auto node: node_objects.children("Gate"))
+	{
+		int id, x, y, w, h;
+		bool output_state;
+		Gate::GATE_TYPE type;
+
+		id = node.attribute("id").as_int();
+		x = node.attribute("x").as_int();
+		y = node.attribute("y").as_int();
+		w = node.attribute("w").as_int();
+		h = node.attribute("h").as_int();
+				type = (Gate::GATE_TYPE)node.attribute("type").as_int();
+		output_state = node.attribute("output_state").as_bool();
+		std::vector<int> output_gate_ids;
+		printf("new gate with id %d\n", id);
+		std::unique_ptr<Gate> gate(new Gate(type, x, y, w, h, id));
+		gate->set_state(output_state);
+
+		/* read output gate ids */
+		for (auto output_node: node.children("output_gate_id"))
+		{
+			int out_id = output_node.attribute("id").as_int();
+			output_gate_ids.push_back(out_id);
+		}
+
+		/*set output ids */
+		for (auto idout =  output_gate_ids.begin(); idout != output_gate_ids.end(); ++idout)
+		{
+			gate->add_output_gate_id((*idout));
+		}
+
+		gates.push_back(std::move(gate));
+	}
+
+	/* iterate again through all gates in the xml file and set output gates if they exist */
+
+	for (auto node: node_objects.children("Gate"))
+	{
+		int input1 = -1;
+		int input2 = -1;
+		Gate *gate;
+
+		if (strcmp(node.attribute("input1_id").as_string(), "") != 0)
+		{
+			input1 = node.attribute("input1_id").as_int();
+			printf("input 1 exists: %d\n", input1);
+		}
+		if (strcmp(node.attribute("input2_id").as_string(), "") != 0)
+		{
+			input2 = node.attribute("input2_id").as_int();
+			printf("input 2 exists: %d\n", input2);
+		}
+
+		gate = find_gate_by_id(node.attribute("id").as_int());
+
+		/* set inputs */
+		if (input1 != -1)
+		{
+			gate->set_input_gate1(find_gate_by_id(input1));
+		}
+
+		if (input2 != -1)
+		{
+			gate->set_input_gate2(find_gate_by_id(input2));
+		}
+	}
+
+	/* set gate id counter */
+	Gate::set_id_counter(next_gate_id);
+	return true;
+}
+
+void
+MainWindow::remove_all_gates()
+{
+	gates.clear();
+	selected_gate = nullptr;
+	selected_input.gate = nullptr;
+	selected_input.input = -1;
+	Gate::set_id_counter(0);
+	draw();
 }
 
 long
@@ -849,5 +970,12 @@ long
 MainWindow::save_button_press(FXObject *sender, FXSelector sel, void *ptr)
 {
 	save_file();
+	return 1;
+}
+
+long
+MainWindow::load_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	load_file();
 	return 1;
 }
