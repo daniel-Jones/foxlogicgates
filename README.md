@@ -22,7 +22,7 @@ Some example circuits are provided in the examples/ directory.
 
 
 # build
-You need the FOX toolkit installed. On arch install the 'fox' package.
+You need the FOX toolkit and pugixml installed. On arch install 'fox' and 'pugixml' packages.
 ```
 cmake CmakeLists.txt
 make
