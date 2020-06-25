@@ -137,9 +137,9 @@ MainWindow::create_ui()
 	new FXHorizontalSeparator(optionsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
 
 	/* save/load */
-	new FXLabel(optionsFrame, "Save", NULL, JUSTIFY_CENTER_X);
+	new FXLabel(optionsFrame, "Save as XML", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
 	new FXButton(optionsFrame, "Save", nullptr, this, MainWindow::ID_BUTTON_SAVE, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXLabel(optionsFrame, "Load", NULL, JUSTIFY_CENTER_X);
+	new FXLabel(optionsFrame, "Load from XML", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
 	new FXButton(optionsFrame, "Load", nullptr, this, MainWindow::ID_BUTTON_LOAD, BUTTON_NORMAL|LAYOUT_FILL_X);
 }
 
