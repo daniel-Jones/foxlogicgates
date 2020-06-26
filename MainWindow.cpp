@@ -76,8 +76,35 @@ MainWindow::create()
 void
 MainWindow::create_ui()
 {
-	contents=new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	toolsFrame = new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP, 0, 0, 0, 0, 10, 10, 10, 10);
+	contents = new FXHorizontalFrame(this, LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+
+	/* icons */
+
+	INPUT_icon = new FXGIFIcon(app, INPUT_icon_data, IMAGE_KEEP);
+	OUTPUT_icon = new FXGIFIcon(app, OUTPUT_icon_data, IMAGE_KEEP);
+	AND_icon = new FXGIFIcon(app, AND_icon_data, IMAGE_KEEP);
+	NAND_icon = new FXGIFIcon(app, NAND_icon_data, IMAGE_KEEP);
+	OR_icon = new FXGIFIcon(app, OR_icon_data, IMAGE_KEEP);
+	NOR_icon = new FXGIFIcon(app, NOR_icon_data, IMAGE_KEEP);
+	XOR_icon = new FXGIFIcon(app, XOR_icon_data, IMAGE_KEEP);
+	XNOR_icon = new FXGIFIcon(app, XNOR_icon_data, IMAGE_KEEP);
+	NOT_icon = new FXGIFIcon(app, NOT_icon_data, IMAGE_KEEP);
+
+	/* tools */
+	toolbox_scroll_area = new FXScrollWindow(contents, FX::SCROLLERS_NORMAL|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0, 0, 200);
+	//toolsFrame = new FXVerticalFrame(toolbox_scroll_area, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_FIX_WIDTH, 0, 0, 70);
+	FXPacker *toolsFrame = new FXPacker(toolbox_scroll_area, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0);
+	new FXLabel(toolsFrame, "Toolbox", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
+	new FXHorizontalSeparator(toolsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "", INPUT_icon, this, MainWindow::ID_BUTTON_INPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "AND", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "NAND", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "OR", OR_icon, this, MainWindow::ID_BUTTON_OR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "NOR", NOR_icon, this, MainWindow::ID_BUTTON_NOR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "XOR", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "XNOR", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "NOT", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL|LAYOUT_FILL_X);
 
 	canvasFrame=new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
 
@@ -91,29 +118,6 @@ MainWindow::create_ui()
 
 	canvas_image = new FXBMPImage(app, NULL, 0, 2048, 2048);
 
-	new FXLabel(toolsFrame, "Toolbox", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
-	new FXHorizontalSeparator(toolsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
-
-	INPUT_icon = new FXGIFIcon(app, INPUT_icon_data, IMAGE_KEEP);
-	OUTPUT_icon = new FXGIFIcon(app, OUTPUT_icon_data, IMAGE_KEEP);
-	AND_icon = new FXGIFIcon(app, AND_icon_data, IMAGE_KEEP);
-	NAND_icon = new FXGIFIcon(app, NAND_icon_data, IMAGE_KEEP);
-	OR_icon = new FXGIFIcon(app, OR_icon_data, IMAGE_KEEP);
-	NOR_icon = new FXGIFIcon(app, NOR_icon_data, IMAGE_KEEP);
-	XOR_icon = new FXGIFIcon(app, XOR_icon_data, IMAGE_KEEP);
-	XNOR_icon = new FXGIFIcon(app, XNOR_icon_data, IMAGE_KEEP);
-	NOT_icon = new FXGIFIcon(app, NOT_icon_data, IMAGE_KEEP);
-
-	/* tools */
-	new FXButton(toolsFrame, "", INPUT_icon, this, MainWindow::ID_BUTTON_INPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "AND", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "NAND", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "OR", OR_icon, this, MainWindow::ID_BUTTON_OR, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "NOR", NOR_icon, this, MainWindow::ID_BUTTON_NOR, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "XOR", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "XNOR", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL|LAYOUT_FILL_X);
-	new FXButton(toolsFrame, "NOT", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL|LAYOUT_FILL_X);
 
 	optionsFrame = new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP, 0, 0, 0, 0, 10, 10, 10, 10);
 	new FXLabel(optionsFrame, "Options", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
