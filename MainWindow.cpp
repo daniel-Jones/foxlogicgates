@@ -12,6 +12,8 @@
 
 #include "MainWindow.h"
 #include "FXMessageBox.h"
+#include "FXScrollArea.h"
+#include "FXScrollBar.h"
 #include "fxdefs.h"
 #include <memory>
 #include <stdio.h>
@@ -82,12 +84,13 @@ MainWindow::create_ui()
 	new FXLabel(canvasFrame,"foxlogicgates", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
 	new FXHorizontalSeparator(canvasFrame, SEPARATOR_GROOVE|LAYOUT_FILL_X);
 
-	scroll_area = new FXScrollWindow(canvasFrame, FX::SCROLLERS_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN);
+	scroll_area = new FXScrollWindow(canvasFrame, FX::SCROLLERS_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	scroll_area->setBackColor(canvasFrame->getBackColor());
-	canvas = new FXCanvas(scroll_area, this, ID_CANVAS, FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN);
+	FXPacker *canvas_packer = new FXPacker(scroll_area, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+	canvas_packer->setBackColor(scroll_area->getBackColor());
+	canvas = new FXCanvas(canvas_packer, this, ID_CANVAS, LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 2048, 2048);
 
-	canvas_image = new FXBMPImage(app, NULL, 0, 5000, 5000);
-
+	canvas_image = new FXBMPImage(app, NULL, 0, 2048, 2048);
 
 	new FXLabel(toolsFrame, "Toolbox", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
 	new FXHorizontalSeparator(toolsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
@@ -269,7 +272,7 @@ MainWindow::draw()
 			continue;
 		Gate *in_gate1 = gate1->get_input_gate1();
 		Gate *in_gate2 = gate1->get_input_gate2();
-		if (gate1->get_input_gate1() != nullptr)
+		if (in_gate1 != nullptr)
 		{
 			if (in_gate1 == selected_input.gate)
 			{
@@ -291,7 +294,7 @@ MainWindow::draw()
 				dc_image.setForeground(FXRGB(0, 0, 0));
 			}
 		}
-		if (gate1->get_input_gate2() != nullptr)
+		if (in_gate2 != nullptr)
 		{
 			if (in_gate2 == selected_input.gate)
 			{
