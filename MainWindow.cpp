@@ -118,8 +118,9 @@ MainWindow::create_ui()
 
 	canvas_image = new FXBMPImage(app, NULL, 0, 2048, 2048);
 
-
-	optionsFrame = new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP, 0, 0, 0, 0, 10, 10, 10, 10);
+	/* options */
+	options_scroll_area = new FXScrollWindow(contents, FX::SCROLLERS_NORMAL|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0, 0, 123);
+	optionsFrame = new FXVerticalFrame(options_scroll_area, FRAME_SUNKEN|LAYOUT_FILL_Y|LAYOUT_TOP, 0, 0, 0, 0, 10, 10, 10, 10);
 	new FXLabel(optionsFrame, "Options", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
 	new FXHorizontalSeparator(optionsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
 

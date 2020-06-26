@@ -111,6 +111,7 @@ class MainWindow : public FXMainWindow
 		FXVerticalFrame   *optionsFrame;
 		FXScrollWindow 	*scroll_area;
 		FXScrollWindow 	*toolbox_scroll_area;
+		FXScrollWindow 	*options_scroll_area;
 		FXCanvas *canvas;
 		FXBMPImage *canvas_image;
 		FXApp *app;
