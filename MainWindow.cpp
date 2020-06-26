@@ -86,9 +86,8 @@ MainWindow::create_ui()
 
 	scroll_area = new FXScrollWindow(canvasFrame, FX::SCROLLERS_NORMAL|LAYOUT_FILL_X|LAYOUT_FILL_Y);
 	scroll_area->setBackColor(canvasFrame->getBackColor());
-	FXPacker *canvas_packer = new FXPacker(scroll_area, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-	canvas_packer->setBackColor(scroll_area->getBackColor());
-	canvas = new FXCanvas(canvas_packer, this, ID_CANVAS, LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 2048, 2048);
+	FXPacker *canvas_packer = new FXPacker(scroll_area, LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 2048, 2048);
+	canvas = new FXCanvas(canvas_packer, this, ID_CANVAS, LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y, 0, 0, 2048, 2048);
 
 	canvas_image = new FXBMPImage(app, NULL, 0, 2048, 2048);
 
@@ -152,7 +151,7 @@ MainWindow::draw()
 	FXDCWindow dc_image(canvas_image);
 	dc_image.setFont(getApp()->getNormalFont());
 	dc_image.setForeground(FXRGB(255, 255, 255));
-	dc_image.fillRectangle(canvas->getX(), canvas->getY(), canvas->getWidth(), canvas->getHeight());
+	dc_image.fillRectangle(canvas->getX()-10, canvas->getY()-10, canvas->getWidth()+10, canvas->getHeight()+10); // -+10 to fix black border
 	dc_image.setForeground(FXRGB(0,0,0));
 	bool drawn_special_link = false;
 
