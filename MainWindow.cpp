@@ -732,14 +732,14 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 		gate = find_gate_at(ev->last_x, ev->last_y);
 		if (gate == selected_gate) /* gates cannot connect to themselves, probably */
 			return 1;
-		if (gate)
+		if (gate && gate->get_gate_type() != Gate::INPUT)
 		{
 			int input = -1;
 			if (ev->last_y-gate->get_y() <= gate->get_height()/2)
 				input = 1;
 			else
 				input = 2;
-			if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() && gate->get_gate_type() != Gate::OUTPUT)
+			if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::OUTPUT)
 			{
 				printf("connecting gate %d with gate %d at input #%d\n", selected_gate->get_id(), gate->get_id(), input);
 				if (input == 1)
