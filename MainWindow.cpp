@@ -257,6 +257,16 @@ MainWindow::draw()
 	{
 		dc_image.drawHashBox(selected_gate->get_x(), selected_gate->get_y(), selected_gate->get_width(), selected_gate->get_height());
 	}
+	else if (!selected_gates.empty())
+	{
+		/* draw border box if multuple gates selected */
+		Gate *selgate;
+		for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+		{
+			selgate = (*g);
+			dc_image.drawHashBox(selgate->get_x(), selgate->get_y(), selgate->get_width(), selgate->get_height());
+		}
+	}
 
 	/* draw dragging link */
 	if (dragging_link && selected_gate)
@@ -323,6 +333,15 @@ MainWindow::draw()
 
 	}
 
+	/*draw rubber band */
+	if (rubberbanding)
+	{
+		FXint mousex, mousey;
+		FXuint mbuttons;
+		canvas->getCursorPosition(mousex, mousey, mbuttons);
+		dc_image.drawRectangle(rubberband_startx, rubberband_starty, mousex-rubberband_startx, mousey-rubberband_starty);
+	}
+
 	/* update options panel */
 	if (selected_gate)
 	{
@@ -336,6 +355,7 @@ MainWindow::draw()
 		input_2_details->setText("(None)");
 		output_details->setText("(None)");
 	}
+
 
 	FXDCWindow dc_canvas(canvas);
 	dc_canvas.drawImage(canvas_image, 0, 0);
@@ -660,6 +680,38 @@ MainWindow::remove_all_gates()
 	draw();
 }
 
+void
+MainWindow::find_gates_in_area(int x, int y, int width, int height)
+{
+	/*
+	 * find all gates in a given rectangle
+	 */
+	Gate *gate;
+	int gx, gy, gw, gh;
+	for (auto g = gates.begin(); g != gates.end(); ++g)
+	{
+		gate = (*g).get();
+		gx = gate->get_x();
+		gy = gate->get_y();
+		gw = gate->get_width();
+		gh = gate->get_height();
+
+		/* check if rectangles intersect */
+		if(gx < x+width && gx+gw > x
+		   && gy < y+height && gy+gh > y)
+		{
+			printf("adding gate %d to selected gates list\n", gate->get_id());
+			selected_gates.push_back(gate);
+		}
+		if (!selected_gates.empty())
+		{
+			selected_gate = nullptr;
+			selected_input.gate = nullptr;
+			selected_input.input = -1;
+		}
+	}
+}
+
 long
 MainWindow::on_paint(FXObject*, FXSelector, void *ptr)
 {
@@ -715,6 +767,17 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 				/* an input is selected */
 			}
 		}
+		else
+		{
+			rubberbanding = true;
+			rubberband_startx = ev->last_x;
+			rubberband_starty = ev->last_y;
+		}
+
+		if (!selected_gates.empty())
+		{
+			selected_gates.clear();
+		}
 	}
 	draw();
 	return 1;
@@ -765,6 +828,13 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 		}
 		dragging_link = false;
 	}
+	if (rubberbanding)
+	{
+		rubberbanding = false;
+		find_gates_in_area(rubberband_startx, rubberband_starty, ev->last_x-rubberband_startx, ev->last_y-rubberband_starty);
+		draw();
+	}
+
 	return 1;
 }
 
@@ -889,9 +959,9 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 long
 MainWindow::on_mouse_move(FXObject *sender, FXSelector sel, void *ptr)
 {
+	FXEvent* event = (FXEvent*)ptr;
 	if (lmouse_down && !dragging_link && selected_gate)
 	{
-		FXEvent* event = (FXEvent*)ptr;
 		selected_gate->set_x(event->last_x-selected_gate->get_width()/2);
 		selected_gate->set_y(event->last_y-selected_gate->get_height()/2);
 	}

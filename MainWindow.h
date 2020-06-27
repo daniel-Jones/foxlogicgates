@@ -101,6 +101,7 @@ class MainWindow : public FXMainWindow
 		Gate *find_gate_at(int x, int y);
 		Gate *find_gate_by_id(int id);
 		void remove_all_gates();
+		void find_gates_in_area(int x, int y, int width, int height);
 
 		bool save_file();
 		bool load_file();
@@ -148,11 +149,15 @@ class MainWindow : public FXMainWindow
 
 		Gate::GATE_TYPE selected_gate_type = Gate::NONE; // the type of gate we will place
 		struct selected_input selected_input;
+		std::vector<Gate *> selected_gates;
 
 		/* mouse */
 		bool lmouse_down = false;
 		bool rmouse_down = false;
 		bool dragging_link = false;
+		bool rubberbanding = false;
+		int rubberband_startx;
+		int rubberband_starty;
 
 		/* keyboard */
 		bool lshift_down = false;
