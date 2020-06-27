@@ -712,6 +712,44 @@ MainWindow::find_gates_in_area(int x, int y, int width, int height)
 	}
 }
 
+void
+MainWindow::remove_gate(Gate &gate)
+{
+	Gate *out_gate;
+	/* delete inputs */
+	if (gate.get_input_gate1())
+	{
+		gate.get_input_gate1()->remove_output_gate_id(gate.get_id());
+		update_gate_state(gate.get_input_gate1());
+	}
+	if (gate.get_input_gate2())
+	{
+		gate.get_input_gate2()->remove_output_gate_id(gate.get_id());
+		update_gate_state(gate.get_input_gate2());
+	}
+
+	/* delete outputs */
+	for(auto g = gate.get_output_gates()->begin(); g != gate.get_output_gates()->end(); ++g)
+	{
+		out_gate = find_gate_by_id((*g));
+		if (!out_gate)
+			continue;
+		out_gate->remove_input_gate(gate.get_id());
+		update_gate_state(out_gate);
+	}
+	int pos = 0;
+	for (auto g = gates.begin(); g != gates.end(); ++g)
+	{
+		out_gate = (*g).get();
+		if (out_gate->get_id() == gate.get_id())
+		{
+			gates.erase(gates.begin() + pos);
+			break;
+		}
+		pos++;
+	}
+}
+
 long
 MainWindow::on_paint(FXObject*, FXSelector, void *ptr)
 {
@@ -934,40 +972,19 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 			}
 			else if (selected_gate)
 			{
+				remove_gate(*selected_gate);
+				selected_gate = nullptr;
+			}
+			else if (!selected_gates.empty())
+			{
+				/* deleted multiple gates */
 				Gate *gate;
-				/* delete inputs */
-				if (selected_gate->get_input_gate1())
+				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 				{
-					selected_gate->get_input_gate1()->remove_output_gate_id(selected_gate->get_id());
-					update_gate_state(selected_gate->get_input_gate1());
-				}
-				if (selected_gate->get_input_gate2())
-				{
-					selected_gate->get_input_gate2()->remove_output_gate_id(selected_gate->get_id());
-					update_gate_state(selected_gate->get_input_gate2());
+					gate = (*g);
+					remove_gate(*gate);
 				}
 
-				/* delete outputs */
-				for(auto g = selected_gate->get_output_gates()->begin(); g != selected_gate->get_output_gates()->end(); ++g)
-				{
-					gate = find_gate_by_id((*g));
-					if (!gate)
-						continue;
-					gate->remove_input_gate(selected_gate->get_id());
-					update_gate_state(gate);
-				}
-				int pos = 0;
-				for (auto g = gates.begin(); g != gates.end(); ++g)
-				{
-					gate = (*g).get();
-					if (gate->get_id() == selected_gate->get_id())
-					{
-						gates.erase(gates.begin() + pos);
-						break;
-					}
-					pos++;
-				}
-				selected_gate = nullptr;
 			}
 			break;
 		}
@@ -1075,7 +1092,6 @@ MainWindow::nor_button_press(FXObject *sender, FXSelector sel, void *ptr)
 long
 MainWindow::xnor_button_press(FXObject *sender, FXSelector sel, void *ptr)
 {
-	puts("xnor");
 	selected_gate = nullptr;
 	selected_gate_type = Gate::XNOR;
 	return 1;

@@ -113,6 +113,7 @@ class MainWindow : public FXMainWindow
 		Gate *find_gate_by_id(int id);
 		void remove_all_gates();
 		void find_gates_in_area(int x, int y, int width, int height);
+		void remove_gate(Gate &gate);
 
 		bool save_file();
 		bool load_file();

@@ -80,7 +80,6 @@ void Gate::update_state()
 
 		case OUTPUT:
 		{
-			/* we're a simple output, do nothing */
 			if (input_gate1 && input_gate1->get_output_state() == true)
 			{
 				this->output_state = true;
