@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <fxkeys.h>
+#include <cstdlib>
 #include "Gate.h"
 #include "icons.h"
 #include "pugixml.hpp" // saving/loading
@@ -158,6 +159,8 @@ class MainWindow : public FXMainWindow
 		bool rubberbanding = false;
 		int rubberband_startx;
 		int rubberband_starty;
+		int multiple_move_startx;
+		int multiple_move_starty;
 
 		/* keyboard */
 		bool lshift_down = false;

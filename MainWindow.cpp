@@ -741,7 +741,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 
 		/* get gate at cursor */
 		gate = find_gate_at(ev->last_x, ev->last_y);
-		if (gate)
+		if (gate && selected_gates.empty())
 		{
 			/* if we found a gate, select it */
 			selected_gate = gate;
@@ -767,7 +767,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 				/* an input is selected */
 			}
 		}
-		else
+		else if (selected_gates.empty()) // TODO: maybe we want to allow rubberbanding when gates are already selected?
 		{
 			rubberbanding = true;
 			rubberband_startx = ev->last_x;
@@ -776,7 +776,29 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 
 		if (!selected_gates.empty())
 		{
-			selected_gates.clear();
+			if (!gate)
+			{
+				selected_gates.clear();
+			}
+			else
+			{
+				Gate *selgate;
+				bool found_gate = false;
+				/* clear selection if we're not clicking on a selected gate */
+				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+				{
+					selgate = (*g);
+					if (gate->get_id() == selgate->get_id())
+					{
+						found_gate = true;
+					}
+				}
+				
+				if (!found_gate)
+				{
+					selected_gates.clear();
+				}
+			}
 		}
 	}
 	draw();
@@ -831,6 +853,8 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 	if (rubberbanding)
 	{
 		rubberbanding = false;
+		multiple_move_startx = ev->last_x;
+		multiple_move_starty = ev->last_y;
 		find_gates_in_area(rubberband_startx, rubberband_starty, ev->last_x-rubberband_startx, ev->last_y-rubberband_starty);
 		draw();
 	}
@@ -965,6 +989,22 @@ MainWindow::on_mouse_move(FXObject *sender, FXSelector sel, void *ptr)
 		selected_gate->set_x(event->last_x-selected_gate->get_width()/2);
 		selected_gate->set_y(event->last_y-selected_gate->get_height()/2);
 	}
+
+	else if (lmouse_down && !dragging_link && !selected_gates.empty())
+	{
+		/* moving multiple gates */
+		Gate *gate;
+		for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+		{
+			gate = (*g);
+			int gx, gy;
+			gx = gate->get_x();
+			gy = gate->get_y();
+			gate->set_x(event->last_x + (event->last_x - gx));
+			gate->set_y(event->last_y + (event->last_y - gy));
+		}
+	}
+
 	if (lmouse_down)
 		draw();
 	return 1;
