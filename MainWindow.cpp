@@ -986,27 +986,33 @@ MainWindow::on_mouse_move(FXObject *sender, FXSelector sel, void *ptr)
 	FXEvent* event = (FXEvent*)ptr;
 	if (lmouse_down && !dragging_link && selected_gate)
 	{
-		selected_gate->set_x(event->last_x-selected_gate->get_width()/2);
-		selected_gate->set_y(event->last_y-selected_gate->get_height()/2);
+		Coord currentPos { event->last_x, event->last_y };
+		auto diff = currentPos - lastPos;
+
+		selected_gate->set_x(selected_gate->get_x() + diff.X);
+		selected_gate->set_y(selected_gate->get_y() + diff.Y);
 	}
 
 	else if (lmouse_down && !dragging_link && !selected_gates.empty())
 	{
+		Coord currentPos { event->last_x, event->last_y };
+		auto diff = currentPos - lastPos;
+
 		/* moving multiple gates */
-		Gate *gate;
-		for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+		for (auto* gate : selected_gates)
 		{
-			gate = (*g);
-			int gx, gy;
-			gx = gate->get_x();
-			gy = gate->get_y();
-			gate->set_x(event->last_x + (event->last_x - gx));
-			gate->set_y(event->last_y + (event->last_y - gy));
+			int gx = gate->get_x();
+			int gy = gate->get_y();
+			gate->set_x(diff.X + gx);
+			gate->set_y(diff.Y + gy);
 		}
 	}
 
 	if (lmouse_down)
 		draw();
+
+	lastPos = { event->last_x, event->last_y };
+
 	return 1;
 }
 

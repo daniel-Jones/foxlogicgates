@@ -95,6 +95,16 @@ class MainWindow : public FXMainWindow
 		MainWindow(){}
 
 	private:
+		struct Coord {
+			int X;
+			int Y;
+
+			Coord operator-(const Coord& other) const
+			{
+				return { X - other.X, Y - other.Y };
+			}
+		};
+
 		void create_ui();
 		void draw();
 		void update_gate_state(Gate *gate);
@@ -161,6 +171,7 @@ class MainWindow : public FXMainWindow
 		int rubberband_starty;
 		int multiple_move_startx;
 		int multiple_move_starty;
+		Coord lastPos;
 
 		/* keyboard */
 		bool lshift_down = false;
