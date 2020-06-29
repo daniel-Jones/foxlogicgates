@@ -36,7 +36,7 @@ class MainWindow : public FXMainWindow
 	FXDECLARE(MainWindow)
 	struct selected_input
 	{
-		Gate *gate;
+		Object *object;
 		int input;
 	};
 
@@ -87,7 +87,7 @@ class MainWindow : public FXMainWindow
 		long load_button_press(FXObject*,FXSelector,void* ptr);
 
 		/* selected gate */
-		Gate *selected_gate = nullptr;
+		Object *selected_gate = nullptr;
 
 		FXApp *get_app(){ return app; };
 
@@ -108,13 +108,13 @@ class MainWindow : public FXMainWindow
 
 		void create_ui();
 		void draw();
-		void update_gate_state(Gate *gate);
+		void update_object_state(Object *object);
 		void find_selected_input(int x, int y);
-		Gate *find_gate_at(int x, int y);
-		Gate *find_gate_by_id(int id);
+		Object *find_object_at(int x, int y);
+		Object *find_object_by_id(int id);
 		void remove_all_gates();
 		void find_gates_in_area(int x, int y, int width, int height);
-		void remove_gate(Gate &gate);
+		void remove_object(Object &object);
 
 		bool save_file();
 		bool load_file();
@@ -179,7 +179,7 @@ class MainWindow : public FXMainWindow
 		bool lshift_down = false;
 
 		/* general */
-		std::vector<std::unique_ptr<Gate>> gates;
+		std::vector<std::unique_ptr<Object>> objects;
 
 		/* saving/loading */
 		std::string file_name = "";

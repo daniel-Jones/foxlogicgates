@@ -162,93 +162,103 @@ MainWindow::draw()
 
 	Gate *gate1;
 
-	/* draw gates */
-	for(auto g1 = gates.begin(); g1 != gates.end(); ++g1)
+	/* draw objects */
+	for(auto g1 = objects.begin(); g1 != objects.end(); ++g1)
 	{
-		gate1 = (*g1).get();
-		switch(gate1->get_gate_type())
+		switch ((*g1)->get_object_type())
 		{
-			case Gate::INPUT:
+			case Object::GATE:
 			{
-				if (gate1->get_output_state() == true)
+				gate1 = (Gate*)(*g1).get();
+				switch(gate1->get_gate_type())
 				{
-					/* input is switched on, indicate so */
-					dc_image.setForeground(FXRGB(255, 255, 0));
-					dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
-					dc_image.setForeground(FXRGB(0,0,0));
+					case Gate::INPUT:
+					{
+						if (gate1->get_output_state() == true)
+						{
+							/* input is switched on, indicate so */
+							dc_image.setForeground(FXRGB(255, 255, 0));
+							dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
+							dc_image.setForeground(FXRGB(0,0,0));
+						}
+						dc_image.drawIcon(INPUT_icon, gate1->get_x(), gate1->get_y());
+						break;
+					}
+
+					case Gate::OUTPUT:
+					{
+						if (gate1->get_output_state() == true)
+						{
+							/* output is on, indicate so */
+							dc_image.setForeground(FXRGB(255, 255, 0));
+		;
+							dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
+							dc_image.setForeground(FXRGB(0,0,0));
+						}
+
+						dc_image.drawIcon(OUTPUT_icon, gate1->get_x(), gate1->get_y());
+						break;
+					}
+
+					case Gate::AND:
+					{
+						dc_image.drawIcon(AND_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "AND");
+						break;
+					}
+
+					case Gate::NAND:
+					{
+						dc_image.drawIcon(NAND_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NAND");
+						break;
+					}
+
+					case Gate::OR:
+					{
+						dc_image.drawIcon(OR_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "OR");
+						break;
+					}
+
+					case Gate::NOR:
+					{
+						dc_image.drawIcon(NOR_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NOR");
+						break;
+					}
+
+					case Gate::XOR:
+					{
+						dc_image.drawIcon(XOR_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "XOR");
+						break;
+					}
+
+					case Gate::XNOR:
+					{
+						dc_image.drawIcon(XNOR_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "XNOR");
+						break;
+					}
+
+
+					case Gate::NOT:
+					{
+						dc_image.drawIcon(NOT_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NOT");
+						break;
+					}
+					case Gate::NONE:
+					default:
+						break;
 				}
-				dc_image.drawIcon(INPUT_icon, gate1->get_x(), gate1->get_y());
-				break;
+					break;
 			}
-
-			case Gate::OUTPUT:
-			{
-				if (gate1->get_output_state() == true)
-				{
-					/* output is on, indicate so */
-					dc_image.setForeground(FXRGB(255, 255, 0));
-;
-					dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
-					dc_image.setForeground(FXRGB(0,0,0));
-				}
-
-				dc_image.drawIcon(OUTPUT_icon, gate1->get_x(), gate1->get_y());
-				break;
-			}
-
-			case Gate::AND:
-			{
-				dc_image.drawIcon(AND_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "AND");
-				break;
-			}
-
-			case Gate::NAND:
-			{
-				dc_image.drawIcon(NAND_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NAND");
-				break;
-			}
-
-			case Gate::OR:
-			{
-				dc_image.drawIcon(OR_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "OR");
-				break;
-			}
-
-			case Gate::NOR:
-			{
-				dc_image.drawIcon(NOR_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NOR");
-				break;
-			}
-
-			case Gate::XOR:
-			{
-				dc_image.drawIcon(XOR_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "XOR");
-				break;
-			}
-
-			case Gate::XNOR:
-			{
-				dc_image.drawIcon(XNOR_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "XNOR");
-				break;
-			}
-
-
-			case Gate::NOT:
-			{
-				dc_image.drawIcon(NOT_icon, gate1->get_x(), gate1->get_y());
-				dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NOT");
-				break;
-			}
-			case Gate::NONE:
+			case Object::NONE:
 			default:
+				printf("implement objects in draw() drawing objects\n");
 				break;
-
 		}
 	}
 
@@ -269,6 +279,7 @@ MainWindow::draw()
 				case Object::GATE:
 					selgate = (Gate*)(*g);
 					dc_image.drawHashBox(selgate->get_x(), selgate->get_y(), selgate->get_width(), selgate->get_height());
+					break;
 				case Object::NONE:
 				default:
 					printf("drawing objects hashbox not implemented for type\n");
@@ -286,59 +297,69 @@ MainWindow::draw()
 	}
 
 	/* draw links */
-	for(auto g1 = gates.begin(); g1 != gates.end(); ++g1)
+	for(auto g1 = objects.begin(); g1 != objects.end(); ++g1)
 	{
 		/* draw lines from input gate->output gate */
-		gate1 = (*g1).get();
-		if (!gate1)
-			continue;
-		Gate *in_gate1 = gate1->get_input_gate1();
-		Gate *in_gate2 = gate1->get_input_gate2();
-		if (in_gate1 != nullptr)
+		switch ((*g1)->get_object_type())
 		{
-			if (in_gate1 == selected_input.gate)
+			case Object::GATE:
 			{
-				dc_image.setForeground(FXRGB(255, 0, 0));
-			}
+				gate1 = (Gate*)(*g1).get();
+				if (!gate1)
+					continue;
+				Gate *in_gate1 = gate1->get_input_gate1();
+				Gate *in_gate2 = gate1->get_input_gate2();
+				if (in_gate1 != nullptr)
+				{
+					if (in_gate1 == selected_input.object)
+					{
+						dc_image.setForeground(FXRGB(255, 0, 0));
+					}
 
-			if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
-			{
-				/* NOT,OUTPUT need a special case */
-				dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
-						gate1->get_x()+10, gate1->get_y()+(gate1->get_height()/2));
-				dc_image.setForeground(FXRGB(0, 0, 0));
+					if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
+					{
+						/* NOT,OUTPUT need a special case */
+						dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
+								gate1->get_x()+10, gate1->get_y()+(gate1->get_height()/2));
+						dc_image.setForeground(FXRGB(0, 0, 0));
 
-			}
-			else
-			{
-				dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
-						gate1->get_x()+10, gate1->get_y()+7);
+					}
+					else
+					{
+						dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
+								gate1->get_x()+10, gate1->get_y()+7);
+						dc_image.setForeground(FXRGB(0, 0, 0));
+					}
+				}
+				if (in_gate2 != nullptr)
+				{
+					if (in_gate2 == selected_input.object)
+					{
+						dc_image.setForeground(FXRGB(255, 0, 0));
+					}
+
+					if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
+					{
+						/* NOT,OUTPUT need a special case */
+						continue;
+
+					}
+					else
+					{
+
+						dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
+								gate1->get_x()+10, gate1->get_y()+43);
+						dc_image.setForeground(FXRGB(0, 0, 0));
+					}
+				}
 				dc_image.setForeground(FXRGB(0, 0, 0));
-			}
+				break;
 		}
-		if (in_gate2 != nullptr)
-		{
-			if (in_gate2 == selected_input.gate)
-			{
-				dc_image.setForeground(FXRGB(255, 0, 0));
-			}
-
-			if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
-			{
-				/* NOT,OUTPUT need a special case */
-				continue;
-
-			}
-			else
-			{
-
-				dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
-						gate1->get_x()+10, gate1->get_y()+43);
-				dc_image.setForeground(FXRGB(0, 0, 0));
-			}
+			case Object::NONE:
+			default:
+				printf("draw() implement other objects\n");
+				break;
 		}
-		dc_image.setForeground(FXRGB(0, 0, 0));
-
 	}
 
 	/*draw rubber band */
@@ -353,9 +374,21 @@ MainWindow::draw()
 	/* update options panel */
 	if (selected_gate)
 	{
-		input_1_details->setText((selected_gate->get_input_gate1() ? selected_gate->get_input_gate1()->get_object_name().c_str() : "(None)"));
-		input_2_details->setText((selected_gate->get_input_gate2() ? selected_gate->get_input_gate2()->get_object_name().c_str() : "(None)"));
-		output_details->setText(selected_gate->get_output_state() ? "ON" : "OFF");
+		switch (selected_gate->get_object_type())
+		{
+			case Object::GATE:
+			{
+				Gate *gate = (Gate*)selected_gate;
+				input_1_details->setText((gate->get_input_gate1() ? gate->get_input_gate1()->get_object_name().c_str() : "(None)"));
+				input_2_details->setText((gate->get_input_gate2() ? gate->get_input_gate2()->get_object_name().c_str() : "(None)"));
+				output_details->setText(gate->get_output_state() ? "ON" : "OFF");
+				break;
+			}
+			case Object::NONE:
+			default:
+				printf("otpion panel update object not impleemtned\n");
+				break;
+		}
 	}
 	else
 	{
@@ -369,59 +402,68 @@ MainWindow::draw()
 	dc_canvas.drawImage(canvas_image, 0, 0);
 }
 
-Gate
-*MainWindow::find_gate_at(int x, int y)
+Object
+*MainWindow::find_object_at(int x, int y)
 {
 	/* iterate backwards through vector to get box on top */
-	Gate *returngate = nullptr;
-	Gate *gate = nullptr;
+	Object *returnobject = nullptr;
+	Object *object = nullptr;
 	int bx, by, bw, bh;
-	for (auto g = gates.rbegin(); g != gates.rend(); ++g)
+	for (auto g = objects.rbegin(); g != objects.rend(); ++g)
 	{
-		gate = (*g).get();
-		bx = gate->get_x();
-		by = gate->get_y();
-		bw = gate->get_width();
-		bh = gate->get_height();
-		/* check if x,y pos is intersecting with the gate */
+		object = (*g).get();
+		bx = object->get_x();
+		by = object->get_y();
+		bw = object->get_width();
+		bh = object->get_height();
+		/* check if x,y pos is intersecting with the object */
 		if (x >= bx && x <= bx+bw &&
 				y >= by && y <= by+bh)
 		{
-			returngate = gate;
+			returnobject = object;
 			break;
 		}
 	}
 
-	return returngate;
+	return returnobject;
 }
 
-Gate
-*MainWindow::find_gate_by_id(int id)
+Object
+*MainWindow::find_object_by_id(int id)
 {
-	/* iterate backwards through vector to get box on top */
-	Gate *gate = nullptr;
-	for (auto g = gates.rbegin(); g != gates.rend(); ++g)
+	/* iterate backwards through vector to get object on top */
+	Object *object = nullptr;
+	for (auto g = objects.rbegin(); g != objects.rend(); ++g)
 	{
-		gate = (*g).get();
-		if (gate->get_id() == id)
-			return gate;
+		object = (*g).get();
+		if (object->get_id() == id)
+			return object;
 	}
-	return gate;
+	return object;
 }
 
 void
-MainWindow::update_gate_state(Gate *gate)
+MainWindow::update_object_state(Object *object)
 {
-	gate->update_state();
+	object->update_state();
 	/* update all gates that are using this gate as an input */
-	Gate *gate2;
-	for(auto g = gate->get_output_gates()->begin(); g != gate->get_output_gates()->end(); ++g)
+	Gate *object2;
+	for(auto o = object->get_output_objects()->begin(); o != object->get_output_objects()->end(); ++o)
 	{
-		 gate2 = find_gate_by_id((*g));
-		 if (gate2)
-		 {
-			 update_gate_state(gate2);
-		 }
+		switch (object->get_object_type())
+		{
+			case Object::GATE:
+				 object2 = (Gate*)find_object_by_id((*o));
+				 if (object2)
+				 {
+					 update_object_state(object2);
+				 }
+				 break;
+			case Object::NONE:
+			default:
+				    printf("implement update_object_state for other types");
+				    break;
+		}
 	}
 
 }
@@ -430,9 +472,12 @@ void
 MainWindow::find_selected_input(int x, int y)
 {
 	Gate *input_gate = nullptr;
+
+	//FIXME: make object
+	Gate *gate = (Gate*)selected_gate;
 	if (!selected_gate)
 	{
-		selected_input.gate = nullptr;
+		selected_input.object = nullptr;
 		selected_input.input = -1;
 		return;
 	}
@@ -453,25 +498,25 @@ MainWindow::find_selected_input(int x, int y)
 		{
 			case 1:
 			{
-				if (selected_gate->get_input_gate1() != nullptr)
+				if (gate->get_input_gate1() != nullptr)
 				{
-					input_gate = selected_gate->get_input_gate1();
+					input_gate = gate->get_input_gate1();
 				}
 				break;
 			}
 
 			case 2:
 			{
-				if (selected_gate->get_input_gate2() != nullptr)
+				if (gate->get_input_gate2() != nullptr)
 				{
-					input_gate = selected_gate->get_input_gate2();
+					input_gate = gate->get_input_gate2();
 				}
 				else
 				{
 					/* special check for gates with only one input */
-					if (selected_gate->get_gate_type() == Gate::NOT || selected_gate->get_gate_type() == Gate::OUTPUT)
+					if (gate->get_gate_type() == Gate::NOT || gate->get_gate_type() == Gate::OUTPUT)
 					{
-						input_gate = selected_gate->get_input_gate1();
+						input_gate = gate->get_input_gate1();
 						input = 1;
 					}
 				}
@@ -484,7 +529,7 @@ MainWindow::find_selected_input(int x, int y)
 		}
 		if (input_gate != nullptr)
 		{
-			selected_input.gate = input_gate;
+			selected_input.object = input_gate;
 			selected_input.input = input;
 			printf("selected input #%d of gate id %d\n", input, selected_gate->get_id());
 		}
@@ -535,29 +580,40 @@ MainWindow::save_file()
 
 	auto root = doc.append_child("Gates");
 
-	/* iterate through all gates and add child nodes */
-	Gate *gate;
-	for (auto g = gates.begin(); g != gates.end(); ++g)
+	/* iterate through all objects and add child nodes */
+	Object *object;
+	for (auto g = objects.begin(); g != objects.end(); ++g)
 	{
 		pugi::xml_node gate_xml = root.append_child("Gate");
-		gate = (*g).get();
-		gate_xml.append_attribute("id") = gate->get_id();
-		gate_xml.append_attribute("x") = gate->get_x();
-		gate_xml.append_attribute("y") = gate->get_y();
-		gate_xml.append_attribute("w") = gate->get_width();
-		gate_xml.append_attribute("h") = gate->get_height();
-		gate_xml.append_attribute("type") = gate->get_gate_type();
-		if (gate->get_input_gate1())
-			gate_xml.append_attribute("input1_id") = gate->get_input_gate1()->get_id();
-		if (gate->get_input_gate2())
-			gate_xml.append_attribute("input2_id") = gate->get_input_gate2()->get_id();
-		gate_xml.append_attribute("output_state") = gate->get_output_state();
-
-		/* iterate through all output gates and write them */
-		for(auto id = gate->get_output_gates()->begin(); id != gate->get_output_gates()->end(); ++id)
+		object = (*g).get();
+		switch (object->get_object_type())
 		{
-			auto outid_node = gate_xml.append_child("output_gate_id");
-			outid_node.append_attribute("id") = (*id);
+			case Object::GATE:
+				Gate *gate;
+				gate = (Gate*)object;
+				gate_xml.append_attribute("id") = object->get_id();
+				gate_xml.append_attribute("x") = object->get_x();
+				gate_xml.append_attribute("y") = object->get_y();
+				gate_xml.append_attribute("w") = object->get_width();
+				gate_xml.append_attribute("h") = object->get_height();
+				gate_xml.append_attribute("type") = gate->get_gate_type();
+				if (gate->get_input_gate1())
+					gate_xml.append_attribute("input1_id") = gate->get_input_gate1()->get_id();
+				if (gate->get_input_gate2())
+					gate_xml.append_attribute("input2_id") = gate->get_input_gate2()->get_id();
+				gate_xml.append_attribute("output_state") = gate->get_output_state();
+
+				/* iterate through all output gates and write them */
+				for(auto id = gate->get_output_objects()->begin(); id != gate->get_output_objects()->end(); ++id)
+				{
+					auto outid_node = gate_xml.append_child("output_gate_id");
+					outid_node.append_attribute("id") = (*id);
+				}
+				break;
+		case Object::NONE:
+		default:
+			printf("save_file() implement other objects\n");
+			break;
 		}
 	}
 
@@ -633,10 +689,10 @@ MainWindow::load_file()
 		/*set output ids */
 		for (auto idout =  output_gate_ids.begin(); idout != output_gate_ids.end(); ++idout)
 		{
-			gate->add_output_gate_id((*idout));
+			gate->add_output_object_id((*idout));
 		}
 
-		gates.push_back(std::move(gate));
+		objects.push_back(std::move(gate));
 	}
 
 	/* iterate again through all gates in the xml file and set output gates if they exist */
@@ -658,17 +714,17 @@ MainWindow::load_file()
 			printf("input 2 exists: %d\n", input2);
 		}
 
-		gate = find_gate_by_id(node.attribute("id").as_int());
+		gate = (Gate*)find_object_by_id(node.attribute("id").as_int());
 
 		/* set inputs */
 		if (input1 != -1)
 		{
-			gate->set_input_gate1(find_gate_by_id(input1));
+			gate->set_input_gate1((Gate*)find_object_by_id(input1));
 		}
 
 		if (input2 != -1)
 		{
-			gate->set_input_gate2(find_gate_by_id(input2));
+			gate->set_input_gate2((Gate*)find_object_by_id(input2));
 		}
 	}
 
@@ -680,9 +736,9 @@ MainWindow::load_file()
 void
 MainWindow::remove_all_gates()
 {
-	gates.clear();
+	objects.clear();
 	selected_gate = nullptr;
-	selected_input.gate = nullptr;
+	selected_input.object = nullptr;
 	selected_input.input = -1;
 	Object::set_object_id_counter(0);
 	draw();
@@ -694,68 +750,82 @@ MainWindow::find_gates_in_area(int x, int y, int width, int height)
 	/*
 	 * find all gates in a given rectangle
 	 */
-	Gate *gate;
+	Object *object;
 	int gx, gy, gw, gh;
-	for (auto g = gates.begin(); g != gates.end(); ++g)
+	for (auto g = objects.begin(); g != objects.end(); ++g)
 	{
-		gate = (*g).get();
-		gx = gate->get_x();
-		gy = gate->get_y();
-		gw = gate->get_width();
-		gh = gate->get_height();
+		object = (*g).get();
+		gx = object->get_x();
+		gy = object->get_y();
+		gw = object->get_width();
+		gh = object->get_height();
 
 		/* check if rectangles intersect */
 		if(gx < x+width && gx+gw > x
 		   && gy < y+height && gy+gh > y)
 		{
-			printf("adding gate %d to selected gates list\n", gate->get_id());
-			selected_gates.push_back(gate);
+			printf("adding object %d to selected objects list\n", object->get_id());
+			selected_gates.push_back(object);
 		}
 		if (!selected_gates.empty())
 		{
 			selected_gate = nullptr;
-			selected_input.gate = nullptr;
+			selected_input.object = nullptr;
 			selected_input.input = -1;
 		}
 	}
 }
 
 void
-MainWindow::remove_gate(Gate &gate)
+MainWindow::remove_object(Object &object)
 {
-	Gate *out_gate;
-	/* delete inputs */
-	if (gate.get_input_gate1())
+	Object *out_object;
+	switch (object.get_object_type())
 	{
-		gate.get_input_gate1()->remove_output_gate_id(gate.get_id());
-		update_gate_state(gate.get_input_gate1());
-	}
-	if (gate.get_input_gate2())
-	{
-		gate.get_input_gate2()->remove_output_gate_id(gate.get_id());
-		update_gate_state(gate.get_input_gate2());
-	}
+		case Object::GATE:
+		{
+			Gate &gate = (Gate&)object;
+			Gate *out_gate;
+			/* delete inputs */
+			if (gate.get_input_gate1())
+			{
+				gate.get_input_gate1()->remove_output_gate_id(gate.get_id());
+				update_object_state(gate.get_input_gate1());
+			}
+			if (gate.get_input_gate2())
+			{
+				gate.get_input_gate2()->remove_output_gate_id(gate.get_id());
+				update_object_state(gate.get_input_gate2());
+			}
 
-	/* delete outputs */
-	for(auto g = gate.get_output_gates()->begin(); g != gate.get_output_gates()->end(); ++g)
-	{
-		out_gate = find_gate_by_id((*g));
-		if (!out_gate)
-			continue;
-		out_gate->remove_input_gate(gate.get_id());
-		update_gate_state(out_gate);
+			/* delete outputs */
+			for(auto g = gate.get_output_objects()->begin(); g != gate.get_output_objects()->end(); ++g)
+			{
+				out_gate = (Gate*)find_object_by_id((*g));
+				if (!out_gate)
+					continue;
+				out_gate->remove_input_gate(gate.get_id());
+				update_object_state(out_gate);
+			}
+			break;
+		}
+		case Object::NONE:
+		default:
+			    printf("remove_object implement other objects\n");
+			    break;
 	}
 	int pos = 0;
-	for (auto g = gates.begin(); g != gates.end(); ++g)
+	for (auto g = objects.begin(); g != objects.end(); ++g)
 	{
-		out_gate = (*g).get();
-		if (out_gate->get_id() == gate.get_id())
+		out_object = (*g).get();
+		if (out_object->get_id() == object.get_id())
 		{
-			gates.erase(gates.begin() + pos);
+			objects.erase(objects.begin() + pos);
 			break;
 		}
 		pos++;
 	}
+
 }
 
 long
@@ -771,36 +841,57 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 	FXEvent *ev = (FXEvent*)ptr;
 	lmouse_down = true;
 	Gate *gate = nullptr;
-	selected_input.gate = nullptr;
+	Object *object = nullptr;
+	selected_input.object = nullptr;
 	selected_input.input = -1;
 	if (selected_gate_type != Gate::NONE)
 	{
 		/* add new gate */
 		std::unique_ptr<Gate> gate(new Gate(selected_gate_type, ev->last_x-70/2, ev->last_y-50/2, 70, 50));
 		selected_gate = gate.get();
-		gates.push_back(std::move(gate));
+		objects.push_back(std::move(gate));
 		selected_gate_type = Gate::NONE;
 	}
 	else
 	{
 		/* do other things */
 
-		/* get gate at cursor */
-		gate = find_gate_at(ev->last_x, ev->last_y);
-		if (gate && selected_gates.empty())
+		/* get object at cursor */
+		object = find_object_at(ev->last_x, ev->last_y);
+		if (object)
 		{
-			/* if we found a gate, select it */
-			selected_gate = gate;
-			if (lshift_down)
+			switch (object->get_object_type())
 			{
-				dragging_link = true;
+				case Object::GATE:
+				{
+					if (object && selected_gates.empty())
+					{
+						/* if we found an object, select it */
+						selected_gate = object;
+						if (lshift_down)
+						{
+							dragging_link = true;
+						}
+						update_object_state(object);
+					}
+					else
+					{
+						selected_gate = nullptr;
+						selected_input.object = nullptr;
+						selected_input.input = -1;
+					}
+					break;
+				}
+				case Object::NONE:
+				default:
+					printf("lmouse down objects not handled\n");
+					break;
 			}
-			update_gate_state(gate);
 		}
 		else
 		{
 			selected_gate = nullptr;
-			selected_input.gate = nullptr;
+			selected_input.object = nullptr;
 			selected_input.input = -1;
 		}
 
@@ -808,7 +899,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 		{
 			/* check if the user clicked on an input and select it */
 			find_selected_input(ev->last_x, ev->last_y);
-			if (selected_input.gate != nullptr)
+			if (selected_input.object != nullptr)
 			{
 				/* an input is selected */
 			}
@@ -822,7 +913,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 
 		if (!selected_gates.empty())
 		{
-			if (!gate)
+			if (!object)
 			{
 				selected_gates.clear();
 			}
@@ -837,7 +928,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 					{
 						case Object::GATE:
 							selgate = (Gate*)(*g);
-							if (gate->get_id() == selgate->get_id())
+							if (object->get_id() == selgate->get_id())
 							{
 								found_gate = true;
 							}
@@ -867,40 +958,52 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 	lmouse_down = false;
 	if (lshift_down && dragging_link && selected_gate)
 	{
-		Gate *gate;
-		gate = find_gate_at(ev->last_x, ev->last_y);
-		if (gate == selected_gate) /* gates cannot connect to themselves, probably */
-			return 1;
-		if (gate && gate->get_gate_type() != Gate::INPUT)
+		Object *object;
+		object = find_object_at(ev->last_x, ev->last_y);
+		switch (object->get_object_type())
 		{
-			int input = -1;
-			if (ev->last_y-gate->get_y() <= gate->get_height()/2)
-				input = 1;
-			else
-				input = 2;
-			if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::OUTPUT)
+			case Object::GATE:
 			{
-				printf("connecting gate %d with gate %d at input #%d\n", selected_gate->get_id(), gate->get_id(), input);
-				if (input == 1)
+				Gate *gate = (Gate*)object;
+				if (gate == selected_gate) /* gates cannot connect to themselves, probably */
+					return 1;
+				if (gate && gate->get_gate_type() != Gate::INPUT)
 				{
-					gate->set_input_gate1(selected_gate);
+					int input = -1;
+					if (ev->last_y-gate->get_y() <= gate->get_height()/2)
+						input = 1;
+					else
+						input = 2;
+					if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::OUTPUT)
+					{
+						printf("connecting gate %d with gate %d at input #%d\n", selected_gate->get_id(), gate->get_id(), input);
+						if (input == 1)
+						{
+							gate->set_input_gate1((Gate*)selected_gate);
+						}
+						else if (input == 2)
+						{
+							gate->set_input_gate2((Gate*)selected_gate);
+						}
+					}
+					else
+					{
+						/* NOT,NOR,OUTPUT gates needs a special case */
+						if (input == 1 || input == 2)
+						{
+							printf("connecting gate %d with gate %d at input #1\n", selected_gate->get_id(), gate->get_id());
+							gate->set_input_gate1((Gate*)selected_gate);
+						}
+					}
+					selected_gate->add_output_object_id(gate->get_id());
+					update_object_state(gate);
 				}
-				else if (input == 2)
-				{
-					gate->set_input_gate2(selected_gate);
-				}
+				break;
 			}
-			else
-			{
-				/* NOT,NOR,OUTPUT gates needs a special case */
-				if (input == 1 || input == 2)
-				{
-					printf("connecting gate %d with gate %d at input #1\n", selected_gate->get_id(), gate->get_id());
-					gate->set_input_gate1(selected_gate);
-				}
-			}
-			selected_gate->add_output_gate_id(gate->get_id());
-			update_gate_state(gate);
+			case Object::NONE:
+			default:
+				printf("not implemented object left down\n");
+				break;
 		}
 		dragging_link = false;
 	}
@@ -920,16 +1023,28 @@ long
 MainWindow::on_right_mouse_down(FXObject*, FXSelector, void *ptr)
 {
 	FXEvent *ev = (FXEvent*)ptr;
-	Gate *gate;
-	gate = find_gate_at(ev->last_x, ev->last_y);
-	if (gate)
+	Object *object;
+	object = find_object_at(ev->last_x, ev->last_y);
+	if (object)
 	{
-		if (gate->get_gate_type() == Gate::INPUT)
+		switch (object->get_object_type())
 		{
-			/* toggle state */
-			gate->set_state(!gate->get_output_state());
+			case Object::GATE:
+			{
+				Gate *gate = (Gate*)object;
+				if (gate->get_gate_type() == Gate::INPUT)
+				{
+					/* toggle state */
+					gate->set_state(!gate->get_output_state());
+				}
+				break;
+			}
+			case Object::NONE:
+			default:
+				printf("rmouse down objects not implemented\n");
+						break;
 		}
-		update_gate_state(gate);
+		update_object_state(object);
 	}
 	draw();
 
@@ -965,30 +1080,32 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 			break;
 		case KEY_Delete:
 		{
-			if (selected_input.gate != nullptr)
+			if (selected_input.object != nullptr)
 			{
 				/* delete link */
+				// FIXME make object
+				Gate *gate = (Gate*)selected_gate;
 				switch (selected_input.input)
 				{
 					case 1:
-						selected_gate->get_input_gate1()->remove_output_gate_id(selected_gate->get_id());
-						selected_gate->set_input_gate1(nullptr);
+						gate->get_input_gate1()->remove_output_gate_id(selected_gate->get_id());
+						gate->set_input_gate1(nullptr);
 						break;
 					case 2:
-						selected_gate->get_input_gate2()->remove_output_gate_id(selected_gate->get_id());
-						selected_gate->set_input_gate2(nullptr);
+						gate->get_input_gate2()->remove_output_gate_id(selected_gate->get_id());
+						gate->set_input_gate2(nullptr);
 						break;
 					default: break;
 				}
-				update_gate_state(selected_gate);
-				update_gate_state(selected_input.gate);
-				selected_input.gate = nullptr;
+				update_object_state(selected_gate);
+				update_object_state(selected_input.object);
+				selected_input.object = nullptr;
 				selected_input.input = -1;
 				draw();
 			}
 			else if (selected_gate)
 			{
-				remove_gate(*selected_gate);
+				remove_object(*selected_gate);
 				selected_gate = nullptr;
 			}
 			else if (!selected_gates.empty())
@@ -1001,7 +1118,7 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 					{
 						case Object::GATE:
 							gate = (Gate*)(*g);
-							remove_gate(*gate);
+							remove_object(*gate);
 							break;
 						case Object::NONE:
 							break;

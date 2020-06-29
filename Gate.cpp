@@ -42,11 +42,11 @@ void
 Gate::remove_output_gate_id(int id)
 {
 	int pos = 0;
-	for(auto g = output_gate_ids.begin(); g != output_gate_ids.end(); ++g)
+	for(auto o = output_object_ids.begin(); o != output_object_ids.end(); ++o)
 	{
-		if (id == (*g))
+		if (id == (*o))
 		{
-			output_gate_ids.erase(output_gate_ids.begin() + pos);
+			output_object_ids.erase(output_object_ids.begin() + pos);
 			break;
 		}
 		pos++;

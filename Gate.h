@@ -41,17 +41,17 @@ class Gate : public Object
 		~Gate();
 
 		bool get_output_state() { return this->output_state; };
-		std::vector<int> *get_output_gates() { return &this->output_gate_ids; };
+		std::vector<int> *get_output_objects() { return &this->output_object_ids; };
 		GATE_TYPE get_gate_type() { return this->gate_type; };
 		Gate *get_input_gate1() { return this->input_gate1; };
 		Gate *get_input_gate2() { return this->input_gate2; };
 		void set_state(bool state) { this->output_state = state; };
 		void set_input_gate1(Gate *gate) { this->input_gate1 = gate; };
 		void set_input_gate2(Gate *gate) { this->input_gate2 = gate; };
-		void add_output_gate_id(int id) { this->output_gate_ids.push_back(id); };
+		void add_output_object_id(int id) { this->output_object_ids.push_back(id); };
 		void remove_output_gate_id(int id);
 		void remove_input_gate(int id);
-		void update_state();
+		void update_state() override;
 
 		std::string get_object_name() override { return get_output_type_text(); };
 
