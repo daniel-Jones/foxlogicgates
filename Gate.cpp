@@ -19,6 +19,7 @@ int Object::object_id_counter = 0; // initialise static object counter FIXME: do
 
 Gate::Gate(GATE_TYPE type, int x, int y, int width, int height, int loaded_id)
 {
+	set_object_type(Object::GATE);
 	this->gate_type = type;
 	this->input_gate1 = nullptr;
 	this->input_gate2 = nullptr;

@@ -261,10 +261,18 @@ MainWindow::draw()
 	{
 		/* draw border box if multuple gates selected */
 		Gate *selgate;
+		// FIXME: selgate needs to be an object and such
 		for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 		{
-			selgate = (Gate*)(*g);
-			dc_image.drawHashBox(selgate->get_x(), selgate->get_y(), selgate->get_width(), selgate->get_height());
+			switch ((*g)->get_object_type())
+			{
+				case Object::GATE:
+					selgate = (Gate*)(*g);
+					dc_image.drawHashBox(selgate->get_x(), selgate->get_y(), selgate->get_width(), selgate->get_height());
+				case Object::NONE:
+				default:
+					printf("drawing objects hashbox not implemented for type\n");
+			}
 		}
 	}
 
@@ -345,8 +353,8 @@ MainWindow::draw()
 	/* update options panel */
 	if (selected_gate)
 	{
-		input_1_details->setText((selected_gate->get_input_gate1() ? selected_gate->get_input_gate1()->get_output_type_text().c_str() : "(None)"));
-		input_2_details->setText((selected_gate->get_input_gate2() ? selected_gate->get_input_gate2()->get_output_type_text().c_str() : "(None)"));
+		input_1_details->setText((selected_gate->get_input_gate1() ? selected_gate->get_input_gate1()->get_object_name().c_str() : "(None)"));
+		input_2_details->setText((selected_gate->get_input_gate2() ? selected_gate->get_input_gate2()->get_object_name().c_str() : "(None)"));
 		output_details->setText(selected_gate->get_output_state() ? "ON" : "OFF");
 	}
 	else
@@ -825,10 +833,18 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 				/* clear selection if we're not clicking on a selected gate */
 				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 				{
-					selgate = (Gate*)(*g);
-					if (gate->get_id() == selgate->get_id())
+					switch ((*g)->get_object_type())
 					{
-						found_gate = true;
+						case Object::GATE:
+							selgate = (Gate*)(*g);
+							if (gate->get_id() == selgate->get_id())
+							{
+								found_gate = true;
+							}
+							break;
+
+						case Object::NONE:
+							break;
 					}
 				}
 				
@@ -981,8 +997,15 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 				Gate *gate;
 				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 				{
-					gate = (Gate*)(*g);
-					remove_gate(*gate);
+					switch ((*g)->get_object_type())
+					{
+						case Object::GATE:
+							gate = (Gate*)(*g);
+							remove_gate(*gate);
+							break;
+						case Object::NONE:
+							break;
+					}
 				}
 
 			}

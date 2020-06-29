@@ -45,7 +45,6 @@ class Gate : public Object
 		GATE_TYPE get_gate_type() { return this->gate_type; };
 		Gate *get_input_gate1() { return this->input_gate1; };
 		Gate *get_input_gate2() { return this->input_gate2; };
-		std::string get_output_type_text();
 		void set_state(bool state) { this->output_state = state; };
 		void set_input_gate1(Gate *gate) { this->input_gate1 = gate; };
 		void set_input_gate2(Gate *gate) { this->input_gate2 = gate; };
@@ -54,6 +53,8 @@ class Gate : public Object
 		void remove_input_gate(int id);
 		void update_state();
 
+		std::string get_object_name() override { return get_output_type_text(); };
+
 
 	private:
 		GATE_TYPE gate_type;
@@ -61,6 +62,8 @@ class Gate : public Object
 		/* inputs/outputs */
 		Gate *input_gate1;
 		Gate *input_gate2;
+
+		std::string get_output_type_text();
 
 		/* states */
 		bool output_state = false;
