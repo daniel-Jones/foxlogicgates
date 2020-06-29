@@ -17,5 +17,6 @@ add_executable(foxlogicgates
 	Gate.cpp
 	Gate.h
 	icons.h
+	Object.h
 )
 target_link_libraries(foxlogicgates FOX-1.6)

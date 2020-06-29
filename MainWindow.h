@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include "Gate.h"
 #include "icons.h"
+#include "Object.h"
 #include "pugixml.hpp" // saving/loading
 
 class MainWindow : public FXMainWindow
@@ -161,7 +162,7 @@ class MainWindow : public FXMainWindow
 
 		Gate::GATE_TYPE selected_gate_type = Gate::NONE; // the type of gate we will place
 		struct selected_input selected_input;
-		std::vector<Gate *> selected_gates;
+		std::vector<Object *> selected_gates;
 
 		/* mouse */
 		bool lmouse_down = false;

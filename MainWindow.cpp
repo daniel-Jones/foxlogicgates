@@ -263,7 +263,7 @@ MainWindow::draw()
 		Gate *selgate;
 		for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 		{
-			selgate = (*g);
+			selgate = (Gate*)(*g);
 			dc_image.drawHashBox(selgate->get_x(), selgate->get_y(), selgate->get_width(), selgate->get_height());
 		}
 	}
@@ -523,7 +523,7 @@ MainWindow::save_file()
 	/* write meta data */
 	auto meta = doc.append_child("Meta");
 	pugi::xml_node info_xml = meta.append_child("Info");
-	info_xml.append_attribute("next_id") = Gate::get_id_counter();
+	info_xml.append_attribute("next_id") = Object::get_object_id_counter();
 
 	auto root = doc.append_child("Gates");
 
@@ -665,7 +665,7 @@ MainWindow::load_file()
 	}
 
 	/* set gate id counter */
-	Gate::set_id_counter(next_gate_id);
+	Object::set_object_id_counter(next_gate_id);
 	return true;
 }
 
@@ -676,7 +676,7 @@ MainWindow::remove_all_gates()
 	selected_gate = nullptr;
 	selected_input.gate = nullptr;
 	selected_input.input = -1;
-	Gate::set_id_counter(0);
+	Object::set_object_id_counter(0);
 	draw();
 }
 
@@ -825,7 +825,7 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 				/* clear selection if we're not clicking on a selected gate */
 				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 				{
-					selgate = (*g);
+					selgate = (Gate*)(*g);
 					if (gate->get_id() == selgate->get_id())
 					{
 						found_gate = true;
@@ -981,7 +981,7 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 				Gate *gate;
 				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
 				{
-					gate = (*g);
+					gate = (Gate*)(*g);
 					remove_gate(*gate);
 				}
 

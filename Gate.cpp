@@ -15,7 +15,7 @@
 
 #include "Gate.h"
 
-int Gate::gate_id_counter = 0;
+int Object::object_id_counter = 0; // initialise static object counter FIXME: do it somehwere else?
 
 Gate::Gate(GATE_TYPE type, int x, int y, int width, int height, int loaded_id)
 {
@@ -28,7 +28,7 @@ Gate::Gate(GATE_TYPE type, int x, int y, int width, int height, int loaded_id)
 	if (loaded_id != -1)
 		this->id = loaded_id;
 	else
-		this->id = Gate::gate_id_counter++; // increment counter after assigning
+		this->id = Object::object_id_counter++; // increment counter after assigning
 	this->x = x;
 	this->y = y;
 	this->w = width;
