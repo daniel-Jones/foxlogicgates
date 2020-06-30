@@ -48,7 +48,6 @@ class Gate : public Object
 		void set_state(bool state) { this->output_state = state; };
 		void set_input_gate1(Gate *gate) { this->input_gate1 = gate; };
 		void set_input_gate2(Gate *gate) { this->input_gate2 = gate; };
-		void add_output_object_id(int id) { this->output_object_ids.push_back(id); };
 		void remove_output_gate_id(int id);
 		void remove_input_gate(int id);
 		void update_state() override;

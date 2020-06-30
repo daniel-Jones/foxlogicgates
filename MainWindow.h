@@ -87,7 +87,7 @@ class MainWindow : public FXMainWindow
 		long load_button_press(FXObject*,FXSelector,void* ptr);
 
 		/* selected gate */
-		Object *selected_gate = nullptr;
+		Object *selected_object = nullptr;
 
 		FXApp *get_app(){ return app; };
 
@@ -160,6 +160,7 @@ class MainWindow : public FXMainWindow
 		FXButton *XNOR_button;
 		FXButton *NOT_button;
 
+		Object::OBJECT_TYPE selected_object_type = Object::NONE; // the type of object we will place
 		Gate::GATE_TYPE selected_gate_type = Gate::NONE; // the type of gate we will place
 		struct selected_input selected_input;
 		std::vector<Object *> selected_gates;
