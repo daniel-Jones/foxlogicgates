@@ -29,6 +29,7 @@
 #include "Gate.h"
 #include "icons.h"
 #include "Object.h"
+#include "BinaryDisplay.h"
 #include "pugixml.hpp" // saving/loading
 
 class MainWindow : public FXMainWindow
@@ -58,6 +59,7 @@ class MainWindow : public FXMainWindow
 			ID_BUTTON_XOR,
 			ID_BUTTON_XNOR,
 			ID_BUTTON_NOT,
+			ID_BUTTON_BINARYDISPLAY,
 
 			ID_BUTTON_SAVE,
 			ID_BUTTON_LOAD,
@@ -81,6 +83,7 @@ class MainWindow : public FXMainWindow
 		long xor_button_press(FXObject*,FXSelector,void* ptr);
 		long xnor_button_press(FXObject*,FXSelector,void* ptr);
 		long not_button_press(FXObject*,FXSelector,void* ptr);
+		long binarydisplay_button_press(FXObject*,FXSelector,void* ptr);
 
 		/* options */
 		long save_button_press(FXObject*,FXSelector,void* ptr);
@@ -148,6 +151,7 @@ class MainWindow : public FXMainWindow
 		FXGIFIcon *XOR_icon;
 		FXGIFIcon *XNOR_icon;
 		FXGIFIcon *NOT_icon;
+		FXGIFIcon *BinaryDisplay_icon;
 
 		/* buttons */
 		FXButton *INPUT_button;
@@ -159,11 +163,12 @@ class MainWindow : public FXMainWindow
 		FXButton *XOR_button;
 		FXButton *XNOR_button;
 		FXButton *NOT_button;
+		FXButton *BinaryDisplay_button;
 
 		Object::OBJECT_TYPE selected_object_type = Object::NONE; // the type of object we will place
 		Gate::GATE_TYPE selected_gate_type = Gate::NONE; // the type of gate we will place
 		struct selected_input selected_input;
-		std::vector<Object *> selected_gates;
+		std::vector<Object *> selected_objects;
 
 		/* mouse */
 		bool lmouse_down = false;

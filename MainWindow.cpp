@@ -38,6 +38,7 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XOR, MainWindow::xor_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XNOR, MainWindow::xnor_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NOT, MainWindow::not_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_BINARYDISPLAY, MainWindow::binarydisplay_button_press),
 
 	/* options */
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_SAVE, MainWindow::save_button_press),
@@ -69,6 +70,7 @@ MainWindow::create()
 	XOR_icon->create();
 	XNOR_icon->create();
 	NOT_icon->create();
+	BinaryDisplay_icon->create();
 	canvas_image->create();
 	show(PLACEMENT_SCREEN);
 }
@@ -89,6 +91,7 @@ MainWindow::create_ui()
 	XOR_icon = new FXGIFIcon(app, XOR_icon_data, IMAGE_KEEP);
 	XNOR_icon = new FXGIFIcon(app, XNOR_icon_data, IMAGE_KEEP);
 	NOT_icon = new FXGIFIcon(app, NOT_icon_data, IMAGE_KEEP);
+	BinaryDisplay_icon = new FXGIFIcon(app, BinaryDisplay_icon_data, IMAGE_KEEP);
 
 	/* tools */
 	toolbox_scroll_area = new FXScrollWindow(contents, FX::SCROLLERS_NORMAL|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0, 0, 200);
@@ -105,6 +108,7 @@ MainWindow::create_ui()
 	new FXButton(toolsFrame, "XOR", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "XNOR", XNOR_icon, this, MainWindow::ID_BUTTON_XNOR, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "NOT", NOT_icon, this, MainWindow::ID_BUTTON_NOT, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "BinaryDisplay", NULL, this, MainWindow::ID_BUTTON_BINARYDISPLAY, BUTTON_NORMAL|LAYOUT_FILL_X);
 
 	canvasFrame=new FXVerticalFrame(contents, FRAME_SUNKEN|LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_TOP|LAYOUT_LEFT, 0, 0, 0, 0, 10, 10, 10, 10);
 
@@ -191,7 +195,6 @@ MainWindow::draw()
 						{
 							/* output is on, indicate so */
 							dc_image.setForeground(FXRGB(255, 255, 0));
-		;
 							dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
 							dc_image.setForeground(FXRGB(0,0,0));
 						}
@@ -255,6 +258,13 @@ MainWindow::draw()
 				}
 					break;
 			}
+			case Object::BINARYDISPLAY:
+			{
+				class BinaryDisplay *bdsp = (class BinaryDisplay*)(*g1).get();
+				dc_image.drawIcon(BinaryDisplay_icon, bdsp->get_x(), bdsp->get_y());
+				dc_image.drawText(bdsp->get_x()+bdsp->get_width()+10, bdsp->get_y()+(bdsp->get_height()/2), FXStringVal(bdsp->get_sum_value()));
+				break;
+			}
 			case Object::NONE:
 			default:
 				printf("implement objects in draw() drawing objects\n");
@@ -267,23 +277,14 @@ MainWindow::draw()
 	{
 		dc_image.drawHashBox(selected_object->get_x(), selected_object->get_y(), selected_object->get_width(), selected_object->get_height());
 	}
-	else if (!selected_gates.empty())
+	else if (!selected_objects.empty())
 	{
 		/* draw border box if multuple gates selected */
-		Gate *selgate;
-		// FIXME: selgate needs to be an object and such
-		for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+		Object *selobject;
+		for (auto g = selected_objects.begin(); g != selected_objects.end(); ++g)
 		{
-			switch ((*g)->get_object_type())
-			{
-				case Object::GATE:
-					selgate = (Gate*)(*g);
-					dc_image.drawHashBox(selgate->get_x(), selgate->get_y(), selgate->get_width(), selgate->get_height());
-					break;
-				case Object::NONE:
-				default:
-					printf("drawing objects hashbox not implemented for type\n");
-			}
+			selobject = (Object*)(*g);
+			dc_image.drawHashBox(selobject->get_x(), selobject->get_y(), selobject->get_width(), selobject->get_height());
 		}
 	}
 
@@ -355,6 +356,11 @@ MainWindow::draw()
 				dc_image.setForeground(FXRGB(0, 0, 0));
 				break;
 		}
+			case Object::BINARYDISPLAY:
+			{
+				printf("imeplement bdsp link drawing\n");
+				break;
+			}
 			case Object::NONE:
 			default:
 				printf("draw() implement other objects\n");
@@ -383,6 +389,10 @@ MainWindow::draw()
 				input_2_details->setText((gate->get_input_gate2() ? gate->get_input_gate2()->get_object_name().c_str() : "(None)"));
 				output_details->setText(gate->get_output_state() ? "ON" : "OFF");
 				break;
+			}
+			case Object::BINARYDISPLAY:
+			{
+				;break;
 			}
 			case Object::NONE:
 			default:
@@ -765,9 +775,9 @@ MainWindow::find_gates_in_area(int x, int y, int width, int height)
 		   && gy < y+height && gy+gh > y)
 		{
 			printf("adding object %d to selected objects list\n", object->get_id());
-			selected_gates.push_back(object);
+			selected_objects.push_back(object);
 		}
-		if (!selected_gates.empty())
+		if (!selected_objects.empty())
 		{
 			selected_object = nullptr;
 			selected_input.object = nullptr;
@@ -789,12 +799,12 @@ MainWindow::remove_object(Object &object)
 			/* delete inputs */
 			if (gate.get_input_gate1())
 			{
-				gate.get_input_gate1()->remove_output_gate_id(gate.get_id());
+				gate.get_input_gate1()->remove_output_object_id(gate.get_id());
 				update_object_state(gate.get_input_gate1());
 			}
 			if (gate.get_input_gate2())
 			{
-				gate.get_input_gate2()->remove_output_gate_id(gate.get_id());
+				gate.get_input_gate2()->remove_output_object_id(gate.get_id());
 				update_object_state(gate.get_input_gate2());
 			}
 
@@ -857,6 +867,15 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 				selected_object_type = Object::NONE;
 				break;
 			}
+			case Object::BINARYDISPLAY:
+			{
+				std::unique_ptr<class BinaryDisplay> binarydisplay(new class BinaryDisplay(ev->last_x-70/2, ev->last_y-50/2, 50, 100));
+				selected_object = binarydisplay.get();
+				objects.push_back(std::move(binarydisplay));
+				selected_object_type = Object::NONE;
+				break;
+			}
+			case Object::NONE:
 			default:
 				printf("Object not implemented. lmouse down\n");
 		}
@@ -869,32 +888,15 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 		object = find_object_at(ev->last_x, ev->last_y);
 		if (object)
 		{
-			switch (object->get_object_type())
+			if (object && selected_objects.empty())
 			{
-				case Object::GATE:
+				/* if we found an object, select it */
+				selected_object = object;
+				if (lshift_down)
 				{
-					if (object && selected_gates.empty())
-					{
-						/* if we found an object, select it */
-						selected_object = object;
-						if (lshift_down)
-						{
-							dragging_link = true;
-						}
-						update_object_state(object);
-					}
-					else
-					{
-						selected_object = nullptr;
-						selected_input.object = nullptr;
-						selected_input.input = -1;
-					}
-					break;
+					dragging_link = true;
 				}
-				case Object::NONE:
-				default:
-					printf("lmouse down objects not handled\n");
-					break;
+				update_object_state(object);
 			}
 		}
 		else
@@ -913,44 +915,36 @@ MainWindow::on_left_mouse_down(FXObject*, FXSelector, void *ptr)
 				/* an input is selected */
 			}
 		}
-		else if (selected_gates.empty()) // TODO: maybe we want to allow rubberbanding when gates are already selected?
+		else if (selected_objects.empty()) // TODO: maybe we want to allow rubberbanding when gates are already selected?
 		{
 			rubberbanding = true;
 			rubberband_startx = ev->last_x;
 			rubberband_starty = ev->last_y;
 		}
 
-		if (!selected_gates.empty())
+		if (!selected_objects.empty())
 		{
 			if (!object)
 			{
-				selected_gates.clear();
+				selected_objects.clear();
 			}
 			else
 			{
 				Gate *selgate;
 				bool found_gate = false;
 				/* clear selection if we're not clicking on a selected gate */
-				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+				for (auto g = selected_objects.begin(); g != selected_objects.end(); ++g)
 				{
-					switch ((*g)->get_object_type())
+					selgate = (Gate*)(*g);
+					if (object->get_id() == selgate->get_id())
 					{
-						case Object::GATE:
-							selgate = (Gate*)(*g);
-							if (object->get_id() == selgate->get_id())
-							{
-								found_gate = true;
-							}
-							break;
-
-						case Object::NONE:
-							break;
+						found_gate = true;
 					}
 				}
 				
 				if (!found_gate)
 				{
-					selected_gates.clear();
+					selected_objects.clear();
 				}
 			}
 		}
@@ -969,50 +963,53 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 	{
 		Object *object;
 		object = find_object_at(ev->last_x, ev->last_y);
-		switch (object->get_object_type())
+		if (object)
 		{
-			case Object::GATE:
+			switch (object->get_object_type())
 			{
-				Gate *gate = (Gate*)object;
-				if (gate == selected_object) /* gates cannot connect to themselves, probably */
-					return 1;
-				if (gate && gate->get_gate_type() != Gate::INPUT)
+				case Object::GATE:
 				{
-					int input = -1;
-					if (ev->last_y-gate->get_y() <= gate->get_height()/2)
-						input = 1;
-					else
-						input = 2;
-					if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::OUTPUT)
+					Gate *gate = (Gate*)object;
+					if (gate == selected_object) /* gates cannot connect to themselves, probably */
+						return 1;
+					if (gate && gate->get_gate_type() != Gate::INPUT)
 					{
-						printf("connecting gate %d with gate %d at input #%d\n", selected_object->get_id(), gate->get_id(), input);
-						if (input == 1)
+						int input = -1;
+						if (ev->last_y-gate->get_y() <= gate->get_height()/2)
+							input = 1;
+						else
+							input = 2;
+						if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::OUTPUT)
 						{
-							gate->set_input_gate1((Gate*)selected_object);
+							printf("connecting gate %d with gate %d at input #%d\n", selected_object->get_id(), gate->get_id(), input);
+							if (input == 1)
+							{
+								gate->set_input_gate1((Gate*)selected_object);
+							}
+							else if (input == 2)
+							{
+								gate->set_input_gate2((Gate*)selected_object);
+							}
 						}
-						else if (input == 2)
+						else
 						{
-							gate->set_input_gate2((Gate*)selected_object);
+							/* NOT,NOR,OUTPUT gates needs a special case */
+							if (input == 1 || input == 2)
+							{
+								printf("connecting gate %d with gate %d at input #1\n", selected_object->get_id(), gate->get_id());
+								gate->set_input_gate1((Gate*)selected_object);
+							}
 						}
+						selected_object->add_output_object_id(gate->get_id());
+						update_object_state(gate);
 					}
-					else
-					{
-						/* NOT,NOR,OUTPUT gates needs a special case */
-						if (input == 1 || input == 2)
-						{
-							printf("connecting gate %d with gate %d at input #1\n", selected_object->get_id(), gate->get_id());
-							gate->set_input_gate1((Gate*)selected_object);
-						}
-					}
-					selected_object->add_output_object_id(gate->get_id());
-					update_object_state(gate);
+					break;
 				}
-				break;
+				case Object::NONE:
+				default:
+					printf("not implemented object left down\n");
+					break;
 			}
-			case Object::NONE:
-			default:
-				printf("not implemented object left down\n");
-				break;
 		}
 		dragging_link = false;
 	}
@@ -1097,11 +1094,11 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 				switch (selected_input.input)
 				{
 					case 1:
-						gate->get_input_gate1()->remove_output_gate_id(selected_object->get_id());
+						gate->get_input_gate1()->remove_output_object_id(selected_object->get_id());
 						gate->set_input_gate1(nullptr);
 						break;
 					case 2:
-						gate->get_input_gate2()->remove_output_gate_id(selected_object->get_id());
+						gate->get_input_gate2()->remove_output_object_id(selected_object->get_id());
 						gate->set_input_gate2(nullptr);
 						break;
 					default: break;
@@ -1117,21 +1114,12 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 				remove_object(*selected_object);
 				selected_object = nullptr;
 			}
-			else if (!selected_gates.empty())
+			else if (!selected_objects.empty())
 			{
 				/* deleted multiple gates */
-				Gate *gate;
-				for (auto g = selected_gates.begin(); g != selected_gates.end(); ++g)
+				for (auto g = selected_objects.begin(); g != selected_objects.end(); ++g)
 				{
-					switch ((*g)->get_object_type())
-					{
-						case Object::GATE:
-							gate = (Gate*)(*g);
-							remove_object(*gate);
-							break;
-						case Object::NONE:
-							break;
-					}
+					remove_object(*(*g));
 				}
 
 			}
@@ -1159,13 +1147,13 @@ MainWindow::on_mouse_move(FXObject *sender, FXSelector sel, void *ptr)
 		selected_object->set_y(selected_object->get_y() + diff.Y);
 	}
 
-	else if (lmouse_down && !dragging_link && !selected_gates.empty())
+	else if (lmouse_down && !dragging_link && !selected_objects.empty())
 	{
 		Coord currentPos { event->last_x, event->last_y };
 		auto diff = currentPos - lastPos;
 
 		/* moving multiple gates */
-		for (auto* gate : selected_gates)
+		for (auto* gate : selected_objects)
 		{
 			int gx = gate->get_x();
 			int gy = gate->get_y();
@@ -1262,6 +1250,15 @@ MainWindow::not_button_press(FXObject *sender, FXSelector sel, void *ptr)
 	selected_gate_type = Gate::NOT;
 	return 1;
 }
+
+long
+MainWindow::binarydisplay_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	selected_object = nullptr;
+	selected_object_type = Object::BINARYDISPLAY;
+	return 1;
+}
+
 
 long
 MainWindow::save_button_press(FXObject *sender, FXSelector sel, void *ptr)

@@ -39,21 +39,6 @@ Gate::Gate(GATE_TYPE type, int x, int y, int width, int height, int loaded_id)
 Gate::~Gate() {}
 
 void
-Gate::remove_output_gate_id(int id)
-{
-	int pos = 0;
-	for(auto o = output_object_ids.begin(); o != output_object_ids.end(); ++o)
-	{
-		if (id == (*o))
-		{
-			output_object_ids.erase(output_object_ids.begin() + pos);
-			break;
-		}
-		pos++;
-	}
-}
-
-void
 Gate::remove_input_gate(int id)
 {
 	if (input_gate1)
