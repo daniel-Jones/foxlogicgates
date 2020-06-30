@@ -868,6 +868,11 @@ MainWindow::remove_object(Object &object)
 			}
 			break;
 		}
+		case Object::BINARYDISPLAY:
+		{
+			class BinaryDisplay &bsdp = (class BinaryDisplay&)object;
+			break;
+		}
 		case Object::NONE:
 		default:
 			    printf("remove_object implement other objects\n");

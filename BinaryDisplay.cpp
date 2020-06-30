@@ -43,8 +43,8 @@ BinaryDisplay::remove_input(int id)
 		input2 = nullptr;
 	if (input3 && input3->get_id() == id)
 		input3 = nullptr;
-	if (input4 && input5->get_id() == id)
-		input5 = nullptr;
+	if (input4 && input4->get_id() == id)
+		input4 = nullptr;
 	if (input5 && input5->get_id() == id)
 		input5 = nullptr;
 	if (input6 && input6->get_id() == id)
