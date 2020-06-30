@@ -74,6 +74,9 @@ class Object
 			}
 		}
 
+		bool get_output_state() { return this->output_state; };
+		void set_state(bool state) { this->output_state = state; };
+
 	protected:
 		int id;
 		int x;
@@ -86,6 +89,9 @@ class Object
 		void set_object_type(OBJECT_TYPE type) { object_type = type; }; // every object must set this, none by default
 
 		static int object_id_counter; // used as the id of a new objecct - this is NOT a count of the number of objects
+
+		/* states */
+		bool output_state = false;
 	
 	private:
 		enum OBJECT_TYPE object_type = NONE;

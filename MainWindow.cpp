@@ -358,7 +358,56 @@ MainWindow::draw()
 		}
 			case Object::BINARYDISPLAY:
 			{
-				printf("imeplement bdsp link drawing\n");
+				class BinaryDisplay *bdsp = (class BinaryDisplay*)(*g1).get();
+				Object *input;
+				int gap = 13;
+				if ((input = bdsp->get_input0()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*7));
+				}
+				if ((input = bdsp->get_input1()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*6));
+				}
+				if ((input = bdsp->get_input2()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*5));
+				}
+				if ((input = bdsp->get_input3()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*4));
+				}
+				if ((input = bdsp->get_input4()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*3));
+				}
+				if ((input = bdsp->get_input5()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*2));
+				}
+				if ((input = bdsp->get_input6()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*2));
+				}
+				if ((input = bdsp->get_input7()))
+				{
+						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+								bdsp->get_x()+10, bdsp->get_y()+(gap*1));
+				}
+
+
+
+
+
+
+
 				break;
 			}
 			case Object::NONE:
@@ -965,13 +1014,13 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 		object = find_object_at(ev->last_x, ev->last_y);
 		if (object)
 		{
+			if (object == selected_object) /* objects cannot connect to themselves, probably */
+				return 1;
 			switch (object->get_object_type())
 			{
 				case Object::GATE:
 				{
 					Gate *gate = (Gate*)object;
-					if (gate == selected_object) /* gates cannot connect to themselves, probably */
-						return 1;
 					if (gate && gate->get_gate_type() != Gate::INPUT)
 					{
 						int input = -1;
@@ -1005,9 +1054,85 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 					}
 					break;
 				}
+				case Object::BINARYDISPLAY:
+				{
+					/* connect object to bdsp input */
+					class BinaryDisplay *bdsp = (class BinaryDisplay*)object;
+					/* figure out which input we're connecting to */
+					int input = -1;
+					int gap = 13;
+					if (ev->last_y-bdsp->get_y() <= gap)
+					{
+						input = 7;
+						puts("input 7");
+						bdsp->set_input7(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+					else if (ev->last_y-(bdsp->get_y()+(gap * 1)) <= gap)
+					{
+						input = 6;
+						puts("input 6");
+						bdsp->set_input6(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+					else if (ev->last_y-(bdsp->get_y()+(gap * 2)) <= gap)
+					{
+						input = 5;
+						puts("input 5");
+						bdsp->set_input5(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+					else if (ev->last_y-(bdsp->get_y()+(gap * 3)) <= gap)
+					{
+						input = 4;
+						puts("input 4");
+						bdsp->set_input4(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+					else if (ev->last_y-(bdsp->get_y()+(gap * 4)) <= gap)
+					{
+						input = 3;
+						puts("input 3");
+						bdsp->set_input3(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+					else if (ev->last_y-(bdsp->get_y()+(gap * 5)) <= gap)
+					{
+						input = 2;
+						puts("input 2");
+						bdsp->set_input2(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+					else if (ev->last_y-(bdsp->get_y()+(gap * 6)) <= gap)
+					{
+						input = 1;
+						puts("input 1");
+						bdsp->set_input1(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+
+					else if (ev->last_y-(bdsp->get_y()+(gap * 7)) <= gap)
+					{
+						input = 0;
+						puts("input 0");
+						bdsp->set_input0(selected_object);
+						selected_object->add_output_object_id(bdsp->get_id());
+						update_object_state(bdsp);
+					}
+
+
+					break;
+				}
 				case Object::NONE:
 				default:
-					printf("not implemented object left down\n");
+					printf("not implemented object left down link\n");
 					break;
 			}
 		}

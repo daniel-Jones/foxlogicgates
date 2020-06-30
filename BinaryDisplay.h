@@ -20,6 +20,17 @@ class BinaryDisplay : public Object
 		Object *get_input6() { return input6; };
 		Object *get_input7() { return input7; };
 
+		void set_input0(Object *object_) { input0 = object_;  };
+		void set_input1(Object *object_) { input1 = object_;  };
+		void set_input2(Object *object_) { input2 = object_;  };
+		void set_input3(Object *object_) { input3 = object_;  };
+		void set_input4(Object *object_) { input4 = object_;  };
+		void set_input5(Object *object_) { input5 = object_;  };
+		void set_input6(Object *object_) { input6 = object_;  };
+		void set_input7(Object *object_) { input7 = object_;  };
+
+		void remove_input(int id);
+
 		int get_sum_value() { return sum_value; };
 	
 	private:
