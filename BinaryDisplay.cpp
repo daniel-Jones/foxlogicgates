@@ -36,7 +36,6 @@ BinaryDisplay::remove_input(int id)
 {
 	if (input0 && input0->get_id() == id)
 		input0 = nullptr;
-
 	if (input1 && input1->get_id() == id)
 		input1 = nullptr;
 	if (input2 && input2->get_id() == id)
@@ -53,5 +52,3 @@ BinaryDisplay::remove_input(int id)
 		input7 = nullptr;
 	update_state();
 }
-
-

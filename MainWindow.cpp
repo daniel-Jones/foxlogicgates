@@ -360,46 +360,46 @@ MainWindow::draw()
 			{
 				class BinaryDisplay *bdsp = (class BinaryDisplay*)(*g1).get();
 				Object *input;
-				int gap = 13;
+				int gap = 5;
 				if ((input = bdsp->get_input0()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*7));
+								bdsp->get_x()+10, bdsp->get_y()+90);
 				}
 				if ((input = bdsp->get_input1()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*6));
+								bdsp->get_x()+10, bdsp->get_y()+80);
 				}
 				if ((input = bdsp->get_input2()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*5));
+								bdsp->get_x()+10, bdsp->get_y()+66);
 				}
 				if ((input = bdsp->get_input3()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*4));
+								bdsp->get_x()+10, bdsp->get_y()+55);
 				}
 				if ((input = bdsp->get_input4()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*3));
+								bdsp->get_x()+10, bdsp->get_y()+44);
 				}
 				if ((input = bdsp->get_input5()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*2));
+								bdsp->get_x()+10, bdsp->get_y()+33);
 				}
 				if ((input = bdsp->get_input6()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*2));
+								bdsp->get_x()+10, bdsp->get_y()+22);
 				}
 				if ((input = bdsp->get_input7()))
 				{
 						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
-								bdsp->get_x()+10, bdsp->get_y()+(gap*1));
+								bdsp->get_x()+10, bdsp->get_y()+11);
 				}
 
 
@@ -434,8 +434,8 @@ MainWindow::draw()
 			case Object::GATE:
 			{
 				Gate *gate = (Gate*)selected_object;
-				input_1_details->setText((gate->get_input_gate1() ? gate->get_input_gate1()->get_object_name().c_str() : "(None)"));
-				input_2_details->setText((gate->get_input_gate2() ? gate->get_input_gate2()->get_object_name().c_str() : "(None)"));
+				input_1_details->setText((gate->get_input_gate1()) ? gate->get_input_gate1()->get_object_name().c_str() : "(None)");
+				input_2_details->setText((gate->get_input_gate2()) ? gate->get_input_gate2()->get_object_name().c_str() : "(None)");
 				output_details->setText(gate->get_output_state() ? "ON" : "OFF");
 				break;
 			}
@@ -445,7 +445,7 @@ MainWindow::draw()
 			}
 			case Object::NONE:
 			default:
-				printf("otpion panel update object not impleemtned\n");
+				printf("otpion panel update object not implemetned\n");
 				break;
 		}
 	}
@@ -870,7 +870,15 @@ MainWindow::remove_object(Object &object)
 		}
 		case Object::BINARYDISPLAY:
 		{
-			class BinaryDisplay &bsdp = (class BinaryDisplay&)object;
+			BinaryDisplay &bdsp = (BinaryDisplay&)object;
+			if (bdsp.get_input0()) { bdsp.get_input0()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input0());  }
+			if (bdsp.get_input1()) { bdsp.get_input1()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input1());  }
+			if (bdsp.get_input2()) { bdsp.get_input2()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input2());  }
+			if (bdsp.get_input3()) { bdsp.get_input3()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input3());  }
+			if (bdsp.get_input4()) { bdsp.get_input4()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input4());  }
+			if (bdsp.get_input5()) { bdsp.get_input5()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input5());  }
+			if (bdsp.get_input6()) { bdsp.get_input6()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input6());  }
+			if (bdsp.get_input7()) { bdsp.get_input7()->remove_output_object_id(bdsp.get_id()); update_object_state(bdsp.get_input7());  }
 			break;
 		}
 		case Object::NONE:

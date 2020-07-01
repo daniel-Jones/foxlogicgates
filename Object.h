@@ -29,7 +29,7 @@ class Object
 		Object(int id_) { id = id_; }; // overloaded constructor for passing id - used when loading
 
 		/*
-		 * this enum is an internal reference to every object, each cobject needs an entry here
+		 * this enum is an internal reference to every kind object, each object needs an entry here
 		 */
 		enum OBJECT_TYPE
 		{
