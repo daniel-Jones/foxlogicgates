@@ -99,7 +99,8 @@ class MainWindow : public FXMainWindow
 		MainWindow(){}
 
 	private:
-		struct Coord {
+		struct Coord
+		{
 			int X;
 			int Y;
 
@@ -115,8 +116,8 @@ class MainWindow : public FXMainWindow
 		void find_selected_input(int x, int y);
 		Object *find_object_at(int x, int y);
 		Object *find_object_by_id(int id);
-		void remove_all_gates();
-		void find_gates_in_area(int x, int y, int width, int height);
+		void remove_all_objects();
+		void find_objects_in_area(int x, int y, int width, int height);
 		void remove_object(Object &object);
 
 		bool save_file();

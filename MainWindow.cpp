@@ -363,51 +363,53 @@ MainWindow::draw()
 				int gap = 5;
 				if ((input = bdsp->get_input0()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+90);
 				}
 				if ((input = bdsp->get_input1()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+80);
 				}
 				if ((input = bdsp->get_input2()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+66);
 				}
 				if ((input = bdsp->get_input3()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+55);
 				}
 				if ((input = bdsp->get_input4()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+44);
 				}
 				if ((input = bdsp->get_input5()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+33);
 				}
 				if ((input = bdsp->get_input6()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+22);
 				}
 				if ((input = bdsp->get_input7()))
 				{
-						dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
+					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
+					dc_image.drawLine(input->get_x()+input->get_width()-5, input->get_y()+(input->get_height()/2),
 								bdsp->get_x()+10, bdsp->get_y()+11);
 				}
-
-
-
-
-
-
-
 				break;
 			}
 			case Object::NONE:
@@ -415,6 +417,7 @@ MainWindow::draw()
 				printf("draw() implement other objects\n");
 				break;
 		}
+		dc_image.setForeground(FXRGB(0, 0, 0));
 	}
 
 	/*draw rubber band */
@@ -588,7 +591,17 @@ MainWindow::find_selected_input(int x, int y)
 			}
 			case Object::BINARYDISPLAY:
 			{
-
+				// forgive me
+				BinaryDisplay *bdsp = (BinaryDisplay*)object;
+				int relypos = y-bdsp->get_y();
+				if (relypos <= 15) 		   { input = 7; input_object = bdsp->get_input7(); }
+				if (relypos >15 && relypos <= 27)  { input = 6; input_object = bdsp->get_input6(); }
+				if (relypos >27 && relypos <= 39)  { input = 5; input_object = bdsp->get_input5(); }
+				if (relypos >39 && relypos <= 50)  { input = 4; input_object = bdsp->get_input4(); }
+				if (relypos >50 && relypos <= 60)  { input = 3; input_object = bdsp->get_input3(); }
+				if (relypos >60 && relypos <= 72)  { input = 2; input_object = bdsp->get_input2(); }
+				if (relypos >72 && relypos <= 84)  { input = 1; input_object = bdsp->get_input1(); }
+				if (relypos >84 && relypos <= 100) { input = 0; input_object = bdsp->get_input0(); }
 				break;
 			}
 			case Object::NONE:
@@ -722,7 +735,7 @@ MainWindow::load_file()
 		return false;
 	}
 
-	remove_all_gates();
+	remove_all_objects();
 
 	/* read meta info */
 	auto meta_objects = doc.child("Meta");
@@ -804,7 +817,7 @@ MainWindow::load_file()
 }
 
 void
-MainWindow::remove_all_gates()
+MainWindow::remove_all_objects()
 {
 	objects.clear();
 	selected_object = nullptr;
@@ -815,7 +828,7 @@ MainWindow::remove_all_gates()
 }
 
 void
-MainWindow::find_gates_in_area(int x, int y, int width, int height)
+MainWindow::find_objects_in_area(int x, int y, int width, int height)
 {
 	/*
 	 * find all gates in a given rectangle
@@ -1149,8 +1162,6 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 						selected_object->add_output_object_id(bdsp->get_id());
 						update_object_state(bdsp);
 					}
-
-
 					break;
 				}
 				case Object::NONE:
@@ -1166,7 +1177,7 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 		rubberbanding = false;
 		multiple_move_startx = ev->last_x;
 		multiple_move_starty = ev->last_y;
-		find_gates_in_area(rubberband_startx, rubberband_starty, ev->last_x-rubberband_startx, ev->last_y-rubberband_starty);
+		find_objects_in_area(rubberband_startx, rubberband_starty, ev->last_x-rubberband_startx, ev->last_y-rubberband_starty);
 		draw();
 	}
 

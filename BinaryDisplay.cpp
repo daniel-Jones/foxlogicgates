@@ -29,6 +29,10 @@ BinaryDisplay::update_state()
 		sum_value |= 1 << 6;
 	if (input7 && input7->get_object_type() == Object::GATE && input7->get_output_state())
 		sum_value |= 1 << 7;
+	if (sum_value > 0)
+		output_state = true;
+	else
+		output_state = false;
 }
 
 void
