@@ -38,6 +38,13 @@ class Object
 			BINARYDISPLAY,
 		};
 
+		struct selected_input_object
+		{
+			Object *object;
+			int input;
+		};
+
+
 		virtual ~Object() = default;
 		int get_id() { return this->id; };
 		int get_x() { return this->x; };
@@ -47,11 +54,11 @@ class Object
 		void set_x(int x) { this->x = x; };
 		void set_y(int y) { this->y = y; };
 		
-		void add_output_object_id(int id) { this->output_object_ids.push_back(id); };
+		void add_output_object_id(int id_) { this->output_object_ids.push_back(id_); };
 
 		virtual void update_state() {}; // subclasses must implement
 
-		static void set_object_id_counter(int id) { object_id_counter = id; };
+		static void set_object_id_counter(int id_) { object_id_counter = id_; };
 		static int get_object_id_counter() { return object_id_counter; };
 
 		OBJECT_TYPE get_object_type() { return object_type; };
@@ -60,12 +67,12 @@ class Object
 
 		std::vector<int> *get_output_objects() { return &this->output_object_ids; };
 
-		void remove_output_object_id(int id)
+		void remove_output_object_id(int id_)
 		{
 			int pos = 0;
 			for(auto o = output_object_ids.begin(); o != output_object_ids.end(); ++o)
 			{
-				if (id == (*o))
+				if (id_ == (*o))
 				{
 					output_object_ids.erase(output_object_ids.begin() + pos);
 					break;
@@ -76,6 +83,8 @@ class Object
 
 		bool get_output_state() { return this->output_state; };
 		void set_state(bool state) { this->output_state = state; };
+
+		virtual void remove_input_object(int id_) { printf("remove_input_object not implemented\n"); };
 
 	protected:
 		int id;

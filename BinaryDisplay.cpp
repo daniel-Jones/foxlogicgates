@@ -32,7 +32,7 @@ BinaryDisplay::update_state()
 }
 
 void
-BinaryDisplay::remove_input(int id)
+BinaryDisplay::remove_input_object(int id)
 {
 	if (input0 && input0->get_id() == id)
 		input0 = nullptr;

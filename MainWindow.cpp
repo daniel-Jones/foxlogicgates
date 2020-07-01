@@ -530,10 +530,10 @@ MainWindow::update_object_state(Object *object)
 void
 MainWindow::find_selected_input(int x, int y)
 {
-	Gate *input_gate = nullptr;
+	Object *input_object = nullptr;
 
 	//FIXME: make object
-	Gate *gate = (Gate*)selected_object;
+	Object *object = selected_object;
 	if (!selected_object)
 	{
 		selected_input.object = nullptr;
@@ -544,53 +544,64 @@ MainWindow::find_selected_input(int x, int y)
 
 	if (x >= selected_object->get_x() && x <= selected_object->get_x() + 20)
 	{
-		if (y-selected_object->get_y() <= selected_object->get_height()/2)
+		switch (selected_object->get_object_type())
 		{
-			input = 1;
-		}
-		else
-		{
-			input = 2;
-		}
-
-		switch (input)
-		{
-			case 1:
+			case Object::GATE:
 			{
-				if (gate->get_input_gate1() != nullptr)
+				Gate *gate = (Gate*)object;
+				if (y-selected_object->get_y() <= selected_object->get_height()/2)
+				{ input = 1; } else { input = 2; }
+				switch (input)
 				{
-					input_gate = gate->get_input_gate1();
-				}
-				break;
-			}
-
-			case 2:
-			{
-				if (gate->get_input_gate2() != nullptr)
-				{
-					input_gate = gate->get_input_gate2();
-				}
-				else
-				{
-					/* special check for gates with only one input */
-					if (gate->get_gate_type() == Gate::NOT || gate->get_gate_type() == Gate::OUTPUT)
+					case 1:
 					{
-						input_gate = gate->get_input_gate1();
-						input = 1;
+						if (gate->get_input_gate1() != nullptr)
+						{
+							input_object = gate->get_input_gate1();
+						}
+						break;
 					}
+
+					case 2:
+					{
+						if (gate->get_input_gate2() != nullptr)
+						{
+							input_object = gate->get_input_gate2();
+						}
+						else
+						{
+							/* special check for gates with only one input */
+							if (gate->get_gate_type() == Gate::NOT || gate->get_gate_type() == Gate::OUTPUT)
+							{
+								input_object = gate->get_input_gate1();
+								input = 1;
+							}
+						}
+						break;
+					}
+
+					default:
+						input = -1;
+						break;
 				}
 				break;
 			}
+			case Object::BINARYDISPLAY:
+			{
 
+				break;
+			}
+			case Object::NONE:
 			default:
-				input = -1;
+				printf("find_selected_input() object not implemented\n");
 				break;
 		}
-		if (input_gate != nullptr)
+
+		if (input_object != nullptr)
 		{
-			selected_input.object = input_gate;
+			selected_input.object = input_object;
 			selected_input.input = input;
-			printf("selected input #%d of gate id %d\n", input, selected_object->get_id());
+			printf("selected input #%d of object id %d\n", input, selected_object->get_id());
 		}
 	}
 }
@@ -844,7 +855,6 @@ MainWindow::remove_object(Object &object)
 		case Object::GATE:
 		{
 			Gate &gate = (Gate&)object;
-			Gate *out_gate;
 			/* delete inputs */
 			if (gate.get_input_gate1())
 			{
@@ -855,16 +865,6 @@ MainWindow::remove_object(Object &object)
 			{
 				gate.get_input_gate2()->remove_output_object_id(gate.get_id());
 				update_object_state(gate.get_input_gate2());
-			}
-
-			/* delete outputs */
-			for(auto g = gate.get_output_objects()->begin(); g != gate.get_output_objects()->end(); ++g)
-			{
-				out_gate = (Gate*)find_object_by_id((*g));
-				if (!out_gate)
-					continue;
-				out_gate->remove_input_gate(gate.get_id());
-				update_object_state(out_gate);
 			}
 			break;
 		}
@@ -886,6 +886,16 @@ MainWindow::remove_object(Object &object)
 			    printf("remove_object implement other objects\n");
 			    break;
 	}
+	/* delete outputs */
+	for(auto g = object.get_output_objects()->begin(); g != object.get_output_objects()->end(); ++g)
+	{
+		out_object = find_object_by_id((*g));
+		if (!out_object)
+			continue;
+		out_object->remove_input_object(object.get_id());
+		update_object_state(out_object);
+	}
+
 	int pos = 0;
 	for (auto g = objects.begin(); g != objects.end(); ++g)
 	{

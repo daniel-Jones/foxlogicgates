@@ -46,11 +46,10 @@ class Gate : public Object
 		Gate *get_input_gate2() { return this->input_gate2; };
 		void set_input_gate1(Gate *gate) { this->input_gate1 = gate; };
 		void set_input_gate2(Gate *gate) { this->input_gate2 = gate; };
-		void remove_input_gate(int id);
+		void remove_input_object(int id) override;
 		void update_state() override;
 
 		std::string get_object_name() override { return get_output_type_text(); };
-
 
 	private:
 		GATE_TYPE gate_type;

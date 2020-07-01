@@ -29,7 +29,7 @@ class BinaryDisplay : public Object
 		void set_input6(Object *object_) { input6 = object_;  };
 		void set_input7(Object *object_) { input7 = object_;  };
 
-		void remove_input(int id);
+		void remove_input_object(int id) override;
 
 		int get_sum_value() { return sum_value; };
 	

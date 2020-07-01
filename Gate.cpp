@@ -38,8 +38,9 @@ Gate::Gate(GATE_TYPE type, int x, int y, int width, int height, int loaded_id)
 
 Gate::~Gate() {}
 
+
 void
-Gate::remove_input_gate(int id)
+Gate::remove_input_object(int id)
 {
 	if (input_gate1)
 	{
