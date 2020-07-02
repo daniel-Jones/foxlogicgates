@@ -360,7 +360,6 @@ MainWindow::draw()
 			{
 				class BinaryDisplay *bdsp = (class BinaryDisplay*)(*g1).get();
 				Object *input;
-				int gap = 5;
 				if ((input = bdsp->get_input0()))
 				{
 					if (input == selected_input.object) { dc_image.setForeground(FXRGB(255, 0, 0)); }
@@ -591,7 +590,6 @@ MainWindow::find_selected_input(int x, int y)
 			}
 			case Object::BINARYDISPLAY:
 			{
-				// forgive me
 				BinaryDisplay *bdsp = (BinaryDisplay*)object;
 				int relypos = y-bdsp->get_y();
 				if (relypos <= 15) 		   { input = 7; input_object = bdsp->get_input7(); }
@@ -1248,19 +1246,46 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 			if (selected_input.object != nullptr)
 			{
 				/* delete link */
-				// FIXME make object
-				Gate *gate = (Gate*)selected_object;
-				switch (selected_input.input)
+				switch (selected_object->get_object_type())
 				{
-					case 1:
-						gate->get_input_gate1()->remove_output_object_id(selected_object->get_id());
-						gate->set_input_gate1(nullptr);
+					case Object::GATE:
+					{
+						Gate *gate = (Gate*)selected_object;
+						switch (selected_input.input)
+						{
+							case 1:
+								gate->get_input_gate1()->remove_output_object_id(selected_object->get_id());
+								gate->set_input_gate1(nullptr);
+								break;
+							case 2:
+								gate->get_input_gate2()->remove_output_object_id(selected_object->get_id());
+								gate->set_input_gate2(nullptr);
+								break;
+							default: break;
+						}
 						break;
-					case 2:
-						gate->get_input_gate2()->remove_output_object_id(selected_object->get_id());
-						gate->set_input_gate2(nullptr);
+					}
+					case Object::BINARYDISPLAY:
+					{
+						BinaryDisplay &bdsp = (BinaryDisplay&)*selected_object;
+						switch (selected_input.input)
+						{
+							case 0: bdsp.get_input0()->remove_output_object_id(bdsp.get_id()); bdsp.set_input0(nullptr); break;
+							case 1: bdsp.get_input1()->remove_output_object_id(bdsp.get_id()); bdsp.set_input1(nullptr); break;
+							case 2: bdsp.get_input2()->remove_output_object_id(bdsp.get_id()); bdsp.set_input2(nullptr); break;
+							case 3: bdsp.get_input3()->remove_output_object_id(bdsp.get_id()); bdsp.set_input3(nullptr); break;
+							case 4: bdsp.get_input4()->remove_output_object_id(bdsp.get_id()); bdsp.set_input4(nullptr); break;
+							case 5: bdsp.get_input5()->remove_output_object_id(bdsp.get_id()); bdsp.set_input5(nullptr); break;
+							case 6: bdsp.get_input6()->remove_output_object_id(bdsp.get_id()); bdsp.set_input6(nullptr); break;
+							case 7: bdsp.get_input7()->remove_output_object_id(bdsp.get_id()); puts("7"); bdsp.set_input7(nullptr); break;
+							default: puts("input not handled in bdsp"); break;
+						}
 						break;
-					default: break;
+					}
+					case Object::NONE:
+					default:
+						printf("remove selected input not implemented for object\n");
+						break;
 				}
 				update_object_state(selected_object);
 				update_object_state(selected_input.object);

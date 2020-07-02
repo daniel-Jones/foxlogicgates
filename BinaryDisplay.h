@@ -32,6 +32,8 @@ class BinaryDisplay : public Object
 		void remove_input_object(int id) override;
 
 		int get_sum_value() { return sum_value; };
+
+		std::string get_object_name() override { return "bdsp"; };
 	
 	private:
 		int sum_value = 0;
