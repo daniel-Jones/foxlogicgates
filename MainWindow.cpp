@@ -511,22 +511,12 @@ MainWindow::update_object_state(Object *object)
 	Gate *object2;
 	for(auto o = object->get_output_objects()->begin(); o != object->get_output_objects()->end(); ++o)
 	{
-		switch (object->get_object_type())
+		object2 = (Gate*)find_object_by_id((*o));
+		if (object2)
 		{
-			case Object::GATE:
-				 object2 = (Gate*)find_object_by_id((*o));
-				 if (object2)
-				 {
-					 update_object_state(object2);
-				 }
-				 break;
-			case Object::NONE:
-			default:
-				    printf("implement update_object_state for other types");
-				    break;
+			update_object_state(object2);
 		}
 	}
-
 }
 
 void
@@ -1277,7 +1267,7 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 							case 4: bdsp.get_input4()->remove_output_object_id(bdsp.get_id()); bdsp.set_input4(nullptr); break;
 							case 5: bdsp.get_input5()->remove_output_object_id(bdsp.get_id()); bdsp.set_input5(nullptr); break;
 							case 6: bdsp.get_input6()->remove_output_object_id(bdsp.get_id()); bdsp.set_input6(nullptr); break;
-							case 7: bdsp.get_input7()->remove_output_object_id(bdsp.get_id()); puts("7"); bdsp.set_input7(nullptr); break;
+							case 7: bdsp.get_input7()->remove_output_object_id(bdsp.get_id()); bdsp.set_input7(nullptr); break;
 							default: puts("input not handled in bdsp"); break;
 						}
 						break;
