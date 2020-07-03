@@ -1,7 +1,12 @@
 #include "BinaryDisplay.h"
 
-BinaryDisplay::BinaryDisplay(int x_, int y_, int width, int height)
+BinaryDisplay::BinaryDisplay(int x_, int y_, int width, int height, int loaded_id)
 {
+	/* special handing of id - if the object is loaded from file the loaded_id will be set and we use that */
+	if (loaded_id != -1)
+		id = loaded_id;
+	else
+		id = Object::object_id_counter++; // increment counter after assigning
 	x = x_;
 	y = y_;
 	w = width;

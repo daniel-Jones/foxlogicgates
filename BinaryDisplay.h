@@ -7,7 +7,7 @@
 class BinaryDisplay : public Object
 {
 	public:
-		BinaryDisplay(int x, int y, int width, int height);
+		BinaryDisplay(int x, int y, int width, int height, int loaded_id = -1);
 		~BinaryDisplay() override = default;
 		void update_state() override;
 

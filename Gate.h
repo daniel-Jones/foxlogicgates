@@ -42,10 +42,10 @@ class Gate : public Object
 
 		std::vector<int> *get_output_objects() { return &this->output_object_ids; };
 		GATE_TYPE get_gate_type() { return this->gate_type; };
-		Gate *get_input_gate1() { return this->input_gate1; };
-		Gate *get_input_gate2() { return this->input_gate2; };
-		void set_input_gate1(Gate *gate) { this->input_gate1 = gate; };
-		void set_input_gate2(Gate *gate) { this->input_gate2 = gate; };
+		Object *get_input_gate1() { return this->input_gate1; };
+		Object *get_input_gate2() { return this->input_gate2; };
+		void set_input_gate1(Object *gate) { this->input_gate1 = gate; };
+		void set_input_gate2(Object *gate) { this->input_gate2 = gate; };
 		void remove_input_object(int id) override;
 		void update_state() override;
 
@@ -55,8 +55,8 @@ class Gate : public Object
 		GATE_TYPE gate_type;
 
 		/* inputs/outputs */
-		Gate *input_gate1;
-		Gate *input_gate2;
+		Object *input_gate1;
+		Object *input_gate2;
 
 		std::string get_output_type_text();
 

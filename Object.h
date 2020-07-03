@@ -25,7 +25,7 @@ class Object
 	 * abstract class that all usable objects should subclass
 	 */
 	public:
-		Object() { id = object_id_counter++; }; // default constructor for all objects
+		Object() { }; // default constructor for all objects
 		Object(int id_) { id = id_; }; // overloaded constructor for passing id - used when loading
 
 		/*
@@ -43,7 +43,6 @@ class Object
 			Object *object;
 			int input;
 		};
-
 
 		virtual ~Object() = default;
 		int get_id() { return this->id; };

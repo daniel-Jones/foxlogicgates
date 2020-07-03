@@ -308,8 +308,8 @@ MainWindow::draw()
 				gate1 = (Gate*)(*g1).get();
 				if (!gate1)
 					continue;
-				Gate *in_gate1 = gate1->get_input_gate1();
-				Gate *in_gate2 = gate1->get_input_gate2();
+				Object *in_gate1 = gate1->get_input_gate1();
+				Object *in_gate2 = gate1->get_input_gate2();
 				if (in_gate1 != nullptr)
 				{
 					if (in_gate1 == selected_input.object)
@@ -524,7 +524,6 @@ MainWindow::find_selected_input(int x, int y)
 {
 	Object *input_object = nullptr;
 
-	//FIXME: make object
 	Object *object = selected_object;
 	if (!selected_object)
 	{
@@ -622,22 +621,6 @@ MainWindow::save_file()
 		return false;
 	}
 
-	/*
-	 * what we need to save:
-	 * Meta:
-	 * 	id for next created gate (we can just write the static variable gate_id_counter, it is incremented to the correct next gate id anyway)
-	 *
-	 * Gates:
-	 * 	id
-	 * 	x pos
-	 * 	y pos
-	 * 	width
-	 * 	height
-	 * 	gate_type (save as int?)
-	 *	input gate (we need the pointer, but we will save the id and make the pointer later)
-	 *	output gates (int vector of ids)
-	 *	output_state
-	 */
 	pugi::xml_document doc;
 	auto declarationNode = doc.append_child(pugi::node_declaration);
 	declarationNode.append_attribute("version")    = "1.0";
@@ -649,42 +632,73 @@ MainWindow::save_file()
 	pugi::xml_node info_xml = meta.append_child("Info");
 	info_xml.append_attribute("next_id") = Object::get_object_id_counter();
 
-	auto root = doc.append_child("Gates");
+	auto root = doc.append_child("Objects");
 
 	/* iterate through all objects and add child nodes */
 	Object *object;
 	for (auto g = objects.begin(); g != objects.end(); ++g)
 	{
-		pugi::xml_node gate_xml = root.append_child("Gate");
 		object = (*g).get();
 		switch (object->get_object_type())
 		{
 			case Object::GATE:
+			{
+				pugi::xml_node object_xml = root.append_child("Gate");
 				Gate *gate;
 				gate = (Gate*)object;
-				gate_xml.append_attribute("id") = object->get_id();
-				gate_xml.append_attribute("x") = object->get_x();
-				gate_xml.append_attribute("y") = object->get_y();
-				gate_xml.append_attribute("w") = object->get_width();
-				gate_xml.append_attribute("h") = object->get_height();
-				gate_xml.append_attribute("type") = gate->get_gate_type();
+				object_xml.append_attribute("id") = object->get_id();
+				object_xml.append_attribute("object_type") = object->get_object_type();
+				object_xml.append_attribute("x") = object->get_x();
+				object_xml.append_attribute("y") = object->get_y();
+				object_xml.append_attribute("w") = object->get_width();
+				object_xml.append_attribute("h") = object->get_height();
+				object_xml.append_attribute("gate_type") = gate->get_gate_type();
 				if (gate->get_input_gate1())
-					gate_xml.append_attribute("input1_id") = gate->get_input_gate1()->get_id();
+					object_xml.append_attribute("input1_id") = gate->get_input_gate1()->get_id();
 				if (gate->get_input_gate2())
-					gate_xml.append_attribute("input2_id") = gate->get_input_gate2()->get_id();
-				gate_xml.append_attribute("output_state") = gate->get_output_state();
+					object_xml.append_attribute("input2_id") = gate->get_input_gate2()->get_id();
+				object_xml.append_attribute("output_state") = gate->get_output_state();
 
 				/* iterate through all output gates and write them */
 				for(auto id = gate->get_output_objects()->begin(); id != gate->get_output_objects()->end(); ++id)
 				{
-					auto outid_node = gate_xml.append_child("output_gate_id");
+					auto outid_node = object_xml.append_child("output_object_id");
 					outid_node.append_attribute("id") = (*id);
 				}
 				break;
-		case Object::NONE:
-		default:
-			printf("save_file() implement other objects\n");
-			break;
+			}
+			case Object::BINARYDISPLAY:
+			{
+				pugi::xml_node object_xml = root.append_child("BinaryDisplay");
+				BinaryDisplay *bdsp = (BinaryDisplay*)object;
+				object_xml.append_attribute("id") = object->get_id();
+				object_xml.append_attribute("object_type") = object->get_object_type();
+				object_xml.append_attribute("x") = object->get_x();
+				object_xml.append_attribute("y") = object->get_y();
+				object_xml.append_attribute("w") = object->get_width();
+				object_xml.append_attribute("h") = object->get_height();
+				if (bdsp->get_input0()) object_xml.append_attribute("input0_id") = bdsp->get_input0()->get_id();
+				if (bdsp->get_input1()) object_xml.append_attribute("input1_id") = bdsp->get_input1()->get_id();
+				if (bdsp->get_input2()) object_xml.append_attribute("input2_id") = bdsp->get_input2()->get_id();
+				if (bdsp->get_input3()) object_xml.append_attribute("input3_id") = bdsp->get_input3()->get_id();
+				if (bdsp->get_input4()) object_xml.append_attribute("input4_id") = bdsp->get_input4()->get_id();
+				if (bdsp->get_input5()) object_xml.append_attribute("input5_id") = bdsp->get_input5()->get_id();
+				if (bdsp->get_input6()) object_xml.append_attribute("input6_id") = bdsp->get_input6()->get_id();
+				if (bdsp->get_input7()) object_xml.append_attribute("input7_id") = bdsp->get_input7()->get_id();
+				object_xml.append_attribute("output_state") = bdsp->get_output_state();
+
+				/* iterate through all output gates and write them */
+				for(auto id = bdsp->get_output_objects()->begin(); id != bdsp->get_output_objects()->end(); ++id)
+				{
+					auto outid_node = object_xml.append_child("output_object_id");
+					outid_node.append_attribute("id") = (*id);
+				}
+				break;
+			}
+			case Object::NONE:
+			default:
+				printf("save_file() implement other objects\n");
+				break;
 		}
 	}
 
@@ -713,7 +727,7 @@ MainWindow::load_file()
 		return false;
 	}
 
-	int next_gate_id = 0;
+	int next_object_id = 0;
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file(file_name.c_str(),
 			            pugi::parse_default|pugi::parse_declaration);
@@ -727,11 +741,12 @@ MainWindow::load_file()
 
 	/* read meta info */
 	auto meta_objects = doc.child("Meta");
-	next_gate_id = meta_objects.child("Info").attribute("next_id").as_int();
-	printf("next gate id after loading is: %d\n", next_gate_id);
+	next_object_id = meta_objects.child("Info").attribute("next_id").as_int();
+	printf("next object id after loading is: %d\n", next_object_id);
+
+	auto node_objects = doc.child("Objects");
 
 	/* read gates */
-	auto node_objects = doc.child("Gates");
 	for (auto node: node_objects.children("Gate"))
 	{
 		int id, x, y, w, h;
@@ -743,7 +758,7 @@ MainWindow::load_file()
 		y = node.attribute("y").as_int();
 		w = node.attribute("w").as_int();
 		h = node.attribute("h").as_int();
-				type = (Gate::GATE_TYPE)node.attribute("type").as_int();
+		type = (Gate::GATE_TYPE)node.attribute("gate_type").as_int();
 		output_state = node.attribute("output_state").as_bool();
 		std::vector<int> output_gate_ids;
 		printf("new gate with id %d\n", id);
@@ -751,7 +766,7 @@ MainWindow::load_file()
 		gate->set_state(output_state);
 
 		/* read output gate ids */
-		for (auto output_node: node.children("output_gate_id"))
+		for (auto output_node: node.children("output_object_id"))
 		{
 			int out_id = output_node.attribute("id").as_int();
 			output_gate_ids.push_back(out_id);
@@ -766,8 +781,41 @@ MainWindow::load_file()
 		objects.push_back(std::move(gate));
 	}
 
-	/* iterate again through all gates in the xml file and set output gates if they exist */
+	/* read binary displays */
+	for (auto node: node_objects.children("BinaryDisplay"))
+	{
+		int id, x, y, w, h;
+		bool output_state;
 
+		id = node.attribute("id").as_int();
+		x = node.attribute("x").as_int();
+		y = node.attribute("y").as_int();
+		w = node.attribute("w").as_int();
+		h = node.attribute("h").as_int();
+		output_state = node.attribute("output_state").as_bool();
+		std::vector<int> output_object_ids;
+		printf("new bdsp with id %d\n", id);
+		std::unique_ptr<BinaryDisplay> bdsp(new BinaryDisplay(x, y, w, h, id));
+		bdsp->set_state(output_state);
+
+		/* read output bdsp ids */
+		for (auto output_node: node.children("output_object_id"))
+		{
+			int out_id = output_node.attribute("id").as_int();
+			output_object_ids.push_back(out_id);
+		}
+
+		/*set output ids */
+		for (auto idout =  output_object_ids.begin(); idout != output_object_ids.end(); ++idout)
+		{
+			bdsp->add_output_object_id((*idout));
+		}
+
+		objects.push_back(std::move(bdsp));
+	}
+
+
+	/* iterate again through all gates in the xml file and set output gates if they exist */
 	for (auto node: node_objects.children("Gate"))
 	{
 		int input1 = -1;
@@ -790,17 +838,64 @@ MainWindow::load_file()
 		/* set inputs */
 		if (input1 != -1)
 		{
-			gate->set_input_gate1((Gate*)find_object_by_id(input1));
+			gate->set_input_gate1(find_object_by_id(input1));
 		}
 
 		if (input2 != -1)
 		{
-			gate->set_input_gate2((Gate*)find_object_by_id(input2));
+			gate->set_input_gate2(find_object_by_id(input2));
 		}
 	}
 
-	/* set gate id counter */
-	Object::set_object_id_counter(next_gate_id);
+	/* iterate again through all bdsp's in the xml file and set output objects if they exist */
+	for (auto node: node_objects.children("BinaryDisplay"))
+	{
+		int input0 = -1;
+		int input1 = -1;
+		int input2 = -1;
+		int input3 = -1;
+		int input4 = -1;
+		int input5 = -1;
+		int input6 = -1;
+		int input7 = -1;
+		BinaryDisplay *bdsp;
+
+		if (strcmp(node.attribute("input0_id").as_string(), "") != 0) { input0 = node.attribute("input0_id").as_int();
+			printf("input 0 exists: %d\n", input0); }
+		if (strcmp(node.attribute("input1_id").as_string(), "") != 0) { input1 = node.attribute("input1_id").as_int();
+			printf("input 1 exists: %d\n", input1); }
+		if (strcmp(node.attribute("input2_id").as_string(), "") != 0) { input2 = node.attribute("input2_id").as_int();
+			printf("input 2 exists: %d\n", input2); }
+		if (strcmp(node.attribute("input3_id").as_string(), "") != 0) { input3 = node.attribute("input3_id").as_int();
+			printf("input 3 exists: %d\n", input3); }
+		if (strcmp(node.attribute("input4_id").as_string(), "") != 0) { input4 = node.attribute("input4_id").as_int();
+			printf("input 4 exists: %d\n", input4); }
+		if (strcmp(node.attribute("input5_id").as_string(), "") != 0) { input5 = node.attribute("input5_id").as_int();
+			printf("input 5 exists: %d\n", input5); }
+		if (strcmp(node.attribute("input6_id").as_string(), "") != 0) { input6 = node.attribute("input6_id").as_int();
+			printf("input 6 exists: %d\n", input6); }
+		if (strcmp(node.attribute("input7_id").as_string(), "") != 0) { input7 = node.attribute("input7_id").as_int();
+			printf("input 7 exists: %d\n", input7); }
+	
+
+		bdsp = (BinaryDisplay*)find_object_by_id(node.attribute("id").as_int());
+
+		/* set inputs */
+		if (input0 != -1) { bdsp->set_input0(find_object_by_id(input0)); }
+		if (input1 != -1) { bdsp->set_input1(find_object_by_id(input1)); }
+		if (input2 != -1) { bdsp->set_input2(find_object_by_id(input2)); }
+		if (input3 != -1) { bdsp->set_input3(find_object_by_id(input3)); }
+		if (input4 != -1) { bdsp->set_input4(find_object_by_id(input4)); }
+		if (input5 != -1) { bdsp->set_input5(find_object_by_id(input5)); }
+		if (input6 != -1) { bdsp->set_input6(find_object_by_id(input6)); }
+		if (input7 != -1) { bdsp->set_input7(find_object_by_id(input7)); }
+		bdsp->update_state();
+	}
+	
+
+	/* set object id counter */
+	Object::set_object_id_counter(next_object_id);
+	draw();
 	return true;
 }
 
