@@ -2,21 +2,21 @@
 <Meta>
 	<Info next_id="6" />
 </Meta>
-<Gates>
-	<Gate id="0" x="67" y="35" w="70" h="50" type="1" output_state="true">
-		<output_gate_id id="4" />
+<Objects>
+	<Gate id="0" x="67" y="35" w="70" h="50" gate_type="1" output_state="true">
+		<output_object_id id="4" />
 	</Gate>
-	<Gate id="1" x="62" y="146" w="70" h="50" type="1" output_state="true">
-		<output_gate_id id="5" />
+	<Gate id="1" x="62" y="146" w="70" h="50" gate_type="1" output_state="true">
+		<output_object_id id="5" />
 	</Gate>
-	<Gate id="2" x="56" y="243" w="70" h="50" type="1" output_state="false">
-		<output_gate_id id="5" />
+	<Gate id="2" x="56" y="243" w="70" h="50" gate_type="1" output_state="false">
+		<output_object_id id="5" />
 	</Gate>
-	<Gate id="3" x="540" y="106" w="70" h="50" type="2" input1_id="4" output_state="true" />
-	<Gate id="4" x="380" y="106" w="70" h="50" type="3" input1_id="0" input2_id="5" output_state="true">
-		<output_gate_id id="3" />
+	<Gate id="3" x="540" y="106" w="70" h="50" gate_type="2" input1_id="4" output_state="true" />
+	<Gate id="4" x="380" y="106" w="70" h="50" gate_type="3" input1_id="0" input2_id="5" output_state="true">
+		<output_object_id id="3" />
 	</Gate>
-	<Gate id="5" x="199" y="178" w="70" h="50" type="4" input1_id="1" input2_id="2" output_state="true">
-		<output_gate_id id="4" />
+	<Gate id="5" x="199" y="178" w="70" h="50" gate_type="4" input1_id="1" input2_id="2" output_state="true">
+		<output_object_id id="4" />
 	</Gate>
-</Gates>
+</Objects>
