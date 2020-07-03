@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Meta>
+	<Info next_id="32" />
+</Meta>
+<Objects>
+	<Gate id="0" object_type="1" x="19" y="6" w="70" h="50" gate_type="1" output_state="true">
+		<output_object_id id="4" />
+		<output_object_id id="10" />
+		<output_object_id id="12" />
+	</Gate>
+	<Gate id="1" object_type="1" x="125" y="6" w="70" h="50" gate_type="1" output_state="true">
+		<output_object_id id="4" />
+		<output_object_id id="15" />
+		<output_object_id id="21" />
+	</Gate>
+	<Gate id="2" object_type="1" x="217" y="7" w="70" h="50" gate_type="1" output_state="false">
+		<output_object_id id="4" />
+		<output_object_id id="17" />
+		<output_object_id id="23" />
+	</Gate>
+	<Gate id="3" object_type="1" x="306" y="5" w="70" h="50" gate_type="1" output_state="true">
+		<output_object_id id="4" />
+		<output_object_id id="19" />
+		<output_object_id id="25" />
+	</Gate>
+	<BinaryDisplay id="4" object_type="2" x="410" y="92" w="50" h="100" input0_id="3" input1_id="2" input2_id="1" input3_id="0" output_state="true" />
+	<Gate id="5" object_type="1" x="507" y="12" w="70" h="50" gate_type="1" output_state="false">
+		<output_object_id id="9" />
+		<output_object_id id="10" />
+		<output_object_id id="12" />
+	</Gate>
+	<Gate id="6" object_type="1" x="580" y="9" w="70" h="50" gate_type="1" output_state="true">
+		<output_object_id id="9" />
+		<output_object_id id="15" />
+		<output_object_id id="21" />
+	</Gate>
+	<Gate id="7" object_type="1" x="667" y="11" w="70" h="50" gate_type="1" output_state="false">
+		<output_object_id id="9" />
+		<output_object_id id="17" />
+		<output_object_id id="23" />
+	</Gate>
+	<Gate id="8" object_type="1" x="755" y="12" w="70" h="50" gate_type="1" output_state="false">
+		<output_object_id id="9" />
+		<output_object_id id="19" />
+		<output_object_id id="25" />
+	</Gate>
+	<BinaryDisplay id="9" object_type="2" x="580" y="90" w="50" h="100" input0_id="8" input1_id="7" input2_id="6" input3_id="5" output_state="true" />
+	<Gate id="10" object_type="1" x="102" y="196" w="70" h="50" gate_type="8" input1_id="0" input2_id="5" output_state="true">
+		<output_object_id id="11" />
+		<output_object_id id="13" />
+	</Gate>
+	<Gate id="11" object_type="1" x="232" y="196" w="70" h="50" gate_type="8" input1_id="10" input2_id="27" output_state="false">
+		<output_object_id id="30" />
+	</Gate>
+	<Gate id="12" object_type="1" x="110" y="302" w="70" h="50" gate_type="3" input1_id="0" input2_id="5" output_state="false">
+		<output_object_id id="14" />
+	</Gate>
+	<Gate id="13" object_type="1" x="216" y="309" w="70" h="50" gate_type="3" input1_id="10" input2_id="27" output_state="true">
+		<output_object_id id="14" />
+	</Gate>
+	<Gate id="14" object_type="1" x="348" y="253" w="70" h="50" gate_type="4" input1_id="12" input2_id="13" output_state="true">
+		<output_object_id id="30" />
+	</Gate>
+	<Gate id="15" object_type="1" x="108" y="441" w="70" h="50" gate_type="8" input1_id="1" input2_id="6" output_state="false">
+		<output_object_id id="16" />
+		<output_object_id id="22" />
+	</Gate>
+	<Gate id="16" object_type="1" x="233" y="430" w="70" h="50" gate_type="8" input1_id="15" input2_id="28" output_state="false">
+		<output_object_id id="30" />
+	</Gate>
+	<Gate id="17" object_type="1" x="95" y="631" w="70" h="50" gate_type="8" input1_id="2" input2_id="7" output_state="false">
+		<output_object_id id="18" />
+		<output_object_id id="24" />
+	</Gate>
+	<Gate id="18" object_type="1" x="237" y="619" w="70" h="50" gate_type="8" input1_id="17" input2_id="29" output_state="false">
+		<output_object_id id="30" />
+	</Gate>
+	<Gate id="19" object_type="1" x="90" y="821" w="70" h="50" gate_type="8" input1_id="3" input2_id="8" output_state="true">
+		<output_object_id id="20" />
+		<output_object_id id="26" />
+	</Gate>
+	<Gate id="20" object_type="1" x="247" y="808" w="70" h="50" gate_type="8" input1_id="19" input2_id="31" output_state="true">
+		<output_object_id id="30" />
+	</Gate>
+	<Gate id="21" object_type="1" x="109" y="519" w="70" h="50" gate_type="3" input1_id="1" input2_id="6" output_state="true">
+		<output_object_id id="27" />
+	</Gate>
+	<Gate id="22" object_type="1" x="239" y="510" w="70" h="50" gate_type="3" input1_id="15" input2_id="28" output_state="false">
+		<output_object_id id="27" />
+	</Gate>
+	<Gate id="23" object_type="1" x="89" y="706" w="70" h="50" gate_type="3" input1_id="2" input2_id="7" output_state="false">
+		<output_object_id id="28" />
+	</Gate>
+	<Gate id="24" object_type="1" x="245" y="713" w="70" h="50" gate_type="3" input1_id="17" input2_id="29" output_state="false">
+		<output_object_id id="28" />
+	</Gate>
+	<Gate id="25" object_type="1" x="76" y="904" w="70" h="50" gate_type="3" input1_id="3" input2_id="8" output_state="false">
+		<output_object_id id="29" />
+	</Gate>
+	<Gate id="26" object_type="1" x="239" y="896" w="70" h="50" gate_type="3" input1_id="19" input2_id="31" output_state="false">
+		<output_object_id id="29" />
+	</Gate>
+	<Gate id="27" object_type="1" x="357" y="463" w="70" h="50" gate_type="4" input1_id="21" input2_id="22" output_state="true">
+		<output_object_id id="13" />
+		<output_object_id id="11" />
+	</Gate>
+	<Gate id="28" object_type="1" x="353" y="653" w="70" h="50" gate_type="4" input1_id="24" input2_id="23" output_state="false">
+		<output_object_id id="30" />
+		<output_object_id id="16" />
+		<output_object_id id="22" />
+	</Gate>
+	<Gate id="29" object_type="1" x="361" y="857" w="70" h="50" gate_type="4" input1_id="26" input2_id="25" output_state="false">
+		<output_object_id id="18" />
+		<output_object_id id="24" />
+	</Gate>
+	<BinaryDisplay id="30" object_type="2" x="601" y="519" w="50" h="100" input0_id="20" input1_id="18" input2_id="16" input3_id="11" input4_id="14" output_state="true" />
+	<Gate id="31" object_type="1" x="-42" y="935" w="70" h="50" gate_type="1" output_state="false">
+		<output_object_id id="20" />
+		<output_object_id id="26" />
+	</Gate>
+</Objects>
