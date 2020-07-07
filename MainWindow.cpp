@@ -507,17 +507,19 @@ void
 MainWindow::update_object_state(Object *object)
 {
 	object->update_state();
-	/* update all gates that are using this gate as an input */
-	Gate *object2;
-	for(auto o = object->get_output_objects()->begin(); o != object->get_output_objects()->end(); ++o)
+	/* update all objects that are using this object as an input */
+	Object *object2;
+	auto output_objects = object->get_output_objects();
+	for(auto o = output_objects->begin(); o != output_objects->end(); ++o)
 	{
-		object2 = (Gate*)find_object_by_id((*o));
+		object2 = find_object_by_id((*o));
 		if (object2)
 		{
 			update_object_state(object2);
 		}
 	}
 }
+
 
 void
 MainWindow::find_selected_input(int x, int y)

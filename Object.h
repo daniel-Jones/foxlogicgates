@@ -55,7 +55,7 @@ class Object
 		
 		void add_output_object_id(int id_) { this->output_object_ids.push_back(id_); };
 
-		virtual void update_state() {}; // subclasses must implement
+		virtual void update_state() = 0; // subclasses must implement
 
 		static void set_object_id_counter(int id_) { object_id_counter = id_; };
 		static int get_object_id_counter() { return object_id_counter; };
