@@ -35,6 +35,7 @@ class Gate : public Object
 			NOR,
 			XOR,
 			XNOR,
+			NAND3,
 		};
 
 		Gate(GATE_TYPE type = INPUT, int x = 0, int y = 0, int width = 70, int height = 50, int id = -1);
@@ -44,8 +45,10 @@ class Gate : public Object
 		GATE_TYPE get_gate_type() { return this->gate_type; };
 		Object *get_input_gate1() { return this->input_gate1; };
 		Object *get_input_gate2() { return this->input_gate2; };
+		Object *get_input_gate3() { return this->input_gate3; };
 		void set_input_gate1(Object *gate) { this->input_gate1 = gate; };
 		void set_input_gate2(Object *gate) { this->input_gate2 = gate; };
+		void set_input_gate3(Object *gate) { this->input_gate3 = gate; };
 		void remove_input_object(int id) override;
 		void update_state() override;
 
@@ -57,6 +60,7 @@ class Gate : public Object
 		/* inputs/outputs */
 		Object *input_gate1;
 		Object *input_gate2;
+		Object *input_gate3;
 
 		std::string get_output_type_text();
 

@@ -32,6 +32,8 @@
 #include "BinaryDisplay.h"
 #include "pugixml.hpp" // saving/loading
 
+class Thread;
+
 class MainWindow : public FXMainWindow
 {
 	FXDECLARE(MainWindow)
@@ -54,6 +56,7 @@ class MainWindow : public FXMainWindow
 			ID_BUTTON_OUTPUT,
 			ID_BUTTON_AND,
 			ID_BUTTON_NAND,
+			ID_BUTTON_3NAND,
 			ID_BUTTON_OR,
 			ID_BUTTON_NOR,
 			ID_BUTTON_XOR,
@@ -63,6 +66,8 @@ class MainWindow : public FXMainWindow
 
 			ID_BUTTON_SAVE,
 			ID_BUTTON_LOAD,
+
+			ID_UPDATE_OBJECTS,
 		};
 
 		/* Event handlers */
@@ -78,6 +83,7 @@ class MainWindow : public FXMainWindow
 		long output_button_press(FXObject*,FXSelector,void* ptr);
 		long and_button_press(FXObject*,FXSelector,void* ptr);
 		long nand_button_press(FXObject*,FXSelector,void* ptr);
+		long nand3_button_press(FXObject*,FXSelector,void* ptr);
 		long or_button_press(FXObject*,FXSelector,void* ptr);
 		long nor_button_press(FXObject*,FXSelector,void* ptr);
 		long xor_button_press(FXObject*,FXSelector,void* ptr);
@@ -93,6 +99,8 @@ class MainWindow : public FXMainWindow
 		Object *selected_object = nullptr;
 
 		FXApp *get_app(){ return app; };
+
+		long update_objects(FXObject*,FXSelector,void* ptr);
 
 
 	protected:
@@ -147,6 +155,7 @@ class MainWindow : public FXMainWindow
 		FXGIFIcon *OUTPUT_icon;
 		FXGIFIcon *AND_icon;
 		FXGIFIcon *NAND_icon;
+		FXGIFIcon *NAND3_icon;
 		FXGIFIcon *OR_icon;
 		FXGIFIcon *NOR_icon;
 		FXGIFIcon *XOR_icon;
@@ -159,6 +168,7 @@ class MainWindow : public FXMainWindow
 		FXButton *OUTPUT_button;
 		FXButton *AND_button;
 		FXButton *NAND_button;
+		FXButton *NAND3_button;
 		FXButton *OR_button;
 		FXButton *NOR_button;
 		FXButton *XOR_button;
@@ -191,6 +201,31 @@ class MainWindow : public FXMainWindow
 		/* saving/loading */
 		std::string file_name = "";
 
+		/* threads */
+		Thread *update_thread;
+		FXMutex lock;
+		FXGUISignal *sig;
+		bool ready_to_draw = false;
+};
+
+class Thread : public FXThread
+{
+
+	private:
+		MainWindow *mw;
+		FXGUISignal *sig;
+
+	public:
+		Thread(MainWindow *mw_, FXGUISignal *sig_) { mw = mw_; sig = sig_; };
+		int run()
+		{
+			while (1)
+			{
+				FXThread::sleep(70000000);
+				sig->signal();
+			};
+			return 0;
+		};
 };
 
 #endif // MAINWINDOW_H

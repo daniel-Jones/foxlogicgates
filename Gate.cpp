@@ -23,6 +23,7 @@ Gate::Gate(GATE_TYPE type, int x, int y, int width, int height, int loaded_id)
 	this->gate_type = type;
 	this->input_gate1 = nullptr;
 	this->input_gate2 = nullptr;
+	this->input_gate3 = nullptr;
 	//this->output_gate = nullptr;
 
 	/* special handing of id - if the gate is loaded from file the loaded_id will be set and we use that */
@@ -53,6 +54,13 @@ Gate::remove_input_object(int id)
 		if (input_gate2->get_id() == id)
 			input_gate2 = nullptr;
 	}
+
+	if (input_gate3)
+	{
+		if (input_gate3->get_id() == id)
+			input_gate3 = nullptr;
+	}
+
 }
 
 void Gate::update_state()
@@ -110,6 +118,12 @@ void Gate::update_state()
 			break;
 		}
 
+		case NAND3:
+		{
+			if (!input_gate1 || !input_gate2 || !input_gate3) { output_state = false; return; }
+			output_state = !(input_gate1->get_output_state() && input_gate2->get_output_state() && input_gate3->get_output_state());
+			break;
+		}
 
 		case NOR:
 		{
@@ -149,53 +163,42 @@ Gate::get_output_type_text()
 		{
 			return "INPUT";
 		}
-
 		case OUTPUT:
 		{
 			return "OUTPUT";
 		}
-
 		case AND:
 		{
 			return "AND";
 		}
-
-
 		case OR:
 		{
 			return "OR";
 		}
-
-
 		case NOT:
 		{
 			return "NOT";
 		}
-
-
 		case NAND:
 		{
 			return "NAND";
 		}
-
-
+		case NAND3:
+		{
+			return "3NAND";
+		}
 		case NOR:
 		{
 			return "NOR";
 		}
-
-
 		case XOR:
 		{
 			return "XOR";
 		}
-
-
 		case XNOR:
 		{
 			return "XNOR";
 		}
-
 		default:
 		return "?";
 	}

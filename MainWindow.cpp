@@ -33,6 +33,7 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_OUTPUT, MainWindow::output_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_AND, MainWindow::and_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NAND, MainWindow::nand_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_3NAND, MainWindow::nand3_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_OR, MainWindow::or_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NOR, MainWindow::nor_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_XOR, MainWindow::xor_button_press),
@@ -43,6 +44,9 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 	/* options */
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_SAVE, MainWindow::save_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_LOAD, MainWindow::load_button_press),
+
+	FXMAPFUNC(SEL_IO_READ, MainWindow::ID_UPDATE_OBJECTS, MainWindow::update_objects),
+
 };
 FXIMPLEMENT(MainWindow, FXMainWindow, MainWindow_Map, ARRAYNUMBER(MainWindow_Map))
 
@@ -51,10 +55,15 @@ MainWindow::MainWindow(FXApp *a)
 {
 	app = a;
 	create_ui();
+	sig = new FXGUISignal(app, this, ID_UPDATE_OBJECTS);
+	update_thread = new Thread(this, sig);
+	update_thread->start();
 }
 
 MainWindow::~MainWindow()
 {
+	delete update_thread;
+	delete sig;
 }
 
 void
@@ -65,6 +74,7 @@ MainWindow::create()
 	OUTPUT_icon->create();
 	AND_icon->create();
 	NAND_icon->create();
+	NAND3_icon->create();
 	OR_icon->create();
 	NOR_icon->create();
 	XOR_icon->create();
@@ -73,6 +83,7 @@ MainWindow::create()
 	BinaryDisplay_icon->create();
 	canvas_image->create();
 	show(PLACEMENT_SCREEN);
+	ready_to_draw = true;
 }
 
 void
@@ -86,6 +97,7 @@ MainWindow::create_ui()
 	OUTPUT_icon = new FXGIFIcon(app, OUTPUT_icon_data, IMAGE_KEEP);
 	AND_icon = new FXGIFIcon(app, AND_icon_data, IMAGE_KEEP);
 	NAND_icon = new FXGIFIcon(app, NAND_icon_data, IMAGE_KEEP);
+	NAND3_icon = new FXGIFIcon(app, NAND3_icon_data, IMAGE_KEEP);
 	OR_icon = new FXGIFIcon(app, OR_icon_data, IMAGE_KEEP);
 	NOR_icon = new FXGIFIcon(app, NOR_icon_data, IMAGE_KEEP);
 	XOR_icon = new FXGIFIcon(app, XOR_icon_data, IMAGE_KEEP);
@@ -103,6 +115,7 @@ MainWindow::create_ui()
 	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "AND", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "NAND", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "3 NAND", NAND3_icon, this, MainWindow::ID_BUTTON_3NAND, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "OR", OR_icon, this, MainWindow::ID_BUTTON_OR, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "NOR", NOR_icon, this, MainWindow::ID_BUTTON_NOR, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "XOR", XOR_icon, this, MainWindow::ID_BUTTON_XOR, BUTTON_NORMAL|LAYOUT_FILL_X);
@@ -157,6 +170,7 @@ MainWindow::create_ui()
 void
 MainWindow::draw()
 {
+	lock.lock();
 	FXDCWindow dc_image(canvas_image);
 	dc_image.setFont(getApp()->getNormalFont());
 	dc_image.setForeground(FXRGB(255, 255, 255));
@@ -214,6 +228,13 @@ MainWindow::draw()
 					{
 						dc_image.drawIcon(NAND_icon, gate1->get_x(), gate1->get_y());
 						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "NAND");
+						break;
+					}
+
+					case Gate::NAND3:
+					{
+						dc_image.drawIcon(NAND3_icon, gate1->get_x(), gate1->get_y());
+						dc_image.drawText(gate1->get_x(), gate1->get_y()+gate1->get_height()+20, "3 Input NAND");
 						break;
 					}
 
@@ -310,6 +331,7 @@ MainWindow::draw()
 					continue;
 				Object *in_gate1 = gate1->get_input_gate1();
 				Object *in_gate2 = gate1->get_input_gate2();
+				Object *in_gate3 = gate1->get_input_gate3();
 				if (in_gate1 != nullptr)
 				{
 					if (in_gate1 == selected_input.object)
@@ -325,6 +347,7 @@ MainWindow::draw()
 						dc_image.setForeground(FXRGB(0, 0, 0));
 
 					}
+					/* nand3 gate does not need a special case for the first input */
 					else
 					{
 						dc_image.drawLine(in_gate1->get_x()+in_gate1->get_width()-5, in_gate1->get_y()+(in_gate1->get_height()/2),
@@ -338,12 +361,18 @@ MainWindow::draw()
 					{
 						dc_image.setForeground(FXRGB(255, 0, 0));
 					}
-
 					if (gate1->get_gate_type() == Gate::NOT || gate1->get_gate_type() == Gate::OUTPUT)
 					{
 						/* NOT,OUTPUT need a special case */
 						continue;
 
+					}
+					else if (gate1->get_gate_type() == Gate::NAND3)
+					{
+						/* special case for 3 input gates */
+						dc_image.drawLine(in_gate2->get_x()+in_gate2->get_width()-5, in_gate2->get_y()+(in_gate2->get_height()/2),
+								gate1->get_x()+10, gate1->get_y()+25);
+						dc_image.setForeground(FXRGB(0, 0, 0));
 					}
 					else
 					{
@@ -352,6 +381,13 @@ MainWindow::draw()
 								gate1->get_x()+10, gate1->get_y()+43);
 						dc_image.setForeground(FXRGB(0, 0, 0));
 					}
+				}
+				if (in_gate3 != nullptr)
+				{
+					/* special case for drawing third input gate */
+					dc_image.drawLine(in_gate3->get_x()+in_gate3->get_width()-5, in_gate3->get_y()+(in_gate3->get_height()/2),
+							gate1->get_x()+10, gate1->get_y()+43);
+						dc_image.setForeground(FXRGB(0, 0, 0));
 				}
 				dc_image.setForeground(FXRGB(0, 0, 0));
 				break;
@@ -461,6 +497,7 @@ MainWindow::draw()
 
 	FXDCWindow dc_canvas(canvas);
 	dc_canvas.drawImage(canvas_image, 0, 0);
+	lock.unlock();
 }
 
 Object
@@ -503,9 +540,30 @@ Object
 	return object;
 }
 
+long
+MainWindow::update_objects(FXObject*,FXSelector,void* ptr)
+{
+	lock.lock();
+	Object *object;
+	for(auto o = objects.begin(); o != objects.end(); ++o)
+	{
+		object = (*o).get();
+		object->update_state();
+	}
+	if (ready_to_draw)
+	{
+		lock.unlock();
+		draw();
+		lock.lock();
+	}
+	lock.unlock();
+	return 1;
+}
+
 void
 MainWindow::update_object_state(Object *object)
 {
+	return;
 	object->update_state();
 	/* update all objects that are using this object as an input */
 	Object *object2;
@@ -519,7 +577,6 @@ MainWindow::update_object_state(Object *object)
 		}
 	}
 }
-
 
 void
 MainWindow::find_selected_input(int x, int y)
@@ -542,45 +599,64 @@ MainWindow::find_selected_input(int x, int y)
 			case Object::GATE:
 			{
 				Gate *gate = (Gate*)object;
-				if (y-selected_object->get_y() <= selected_object->get_height()/2)
-				{ input = 1; } else { input = 2; }
-				switch (input)
+				switch (gate->get_gate_type())
 				{
-					case 1:
+					case Gate::NAND3:
 					{
-						if (gate->get_input_gate1() != nullptr)
-						{
-							input_object = gate->get_input_gate1();
-						}
+						puts("nand");
+						/* 3 input gates */
+						int relypos = y-gate->get_y();
+						if (relypos <= 16) 		   { input = 1; input_object = gate->get_input_gate1(); }
+						if (relypos >16 && relypos <= 34)  { input = 2; input_object = gate->get_input_gate2(); }
+						if (relypos >34)  		   { input = 3; input_object = gate->get_input_gate3(); }
 						break;
 					}
-
-					case 2:
-					{
-						if (gate->get_input_gate2() != nullptr)
-						{
-							input_object = gate->get_input_gate2();
-						}
-						else
-						{
-							/* special check for gates with only one input */
-							if (gate->get_gate_type() == Gate::NOT || gate->get_gate_type() == Gate::OUTPUT)
-							{
-								input_object = gate->get_input_gate1();
-								input = 1;
-							}
-						}
-						break;
-					}
-
 					default:
-						input = -1;
-						break;
+					{
+						/* 2 or 1 input gates */
+						if (y-selected_object->get_y() <= selected_object->get_height()/2)
+						{ input = 1; } else { input = 2; }
+						switch (input)
+						{
+							case 1:
+							{
+								if (gate->get_input_gate1() != nullptr)
+								{
+									input_object = gate->get_input_gate1();
+								}
+								break;
+							}
+
+							case 2:
+							{
+								if (gate->get_input_gate2() != nullptr)
+								{
+									input_object = gate->get_input_gate2();
+								}
+								else
+								{
+									/* special check for gates with only one input */
+									if (gate->get_gate_type() == Gate::NOT || gate->get_gate_type() == Gate::OUTPUT)
+									{
+										input_object = gate->get_input_gate1();
+										input = 1;
+									}
+								}
+								break;
+							}
+
+							default:
+								input = -1;
+								break;
+						}
+					break;
+					}
 				}
 				break;
 			}
 			case Object::BINARYDISPLAY:
 			{
+				puts("bdsp");
 				BinaryDisplay *bdsp = (BinaryDisplay*)object;
 				int relypos = y-bdsp->get_y();
 				if (relypos <= 15) 		   { input = 7; input_object = bdsp->get_input7(); }
@@ -659,6 +735,8 @@ MainWindow::save_file()
 					object_xml.append_attribute("input1_id") = gate->get_input_gate1()->get_id();
 				if (gate->get_input_gate2())
 					object_xml.append_attribute("input2_id") = gate->get_input_gate2()->get_id();
+				if (gate->get_input_gate3())
+					object_xml.append_attribute("input3_id") = gate->get_input_gate3()->get_id();
 				object_xml.append_attribute("output_state") = gate->get_output_state();
 
 				/* iterate through all output gates and write them */
@@ -817,11 +895,12 @@ MainWindow::load_file()
 	}
 
 
-	/* iterate again through all gates in the xml file and set output gates if they exist */
+	/* iterate again through all gates in the xml file and set input gates if they exist */
 	for (auto node: node_objects.children("Gate"))
 	{
 		int input1 = -1;
 		int input2 = -1;
+		int input3 = -1;
 		Gate *gate;
 
 		if (strcmp(node.attribute("input1_id").as_string(), "") != 0)
@@ -834,6 +913,12 @@ MainWindow::load_file()
 			input2 = node.attribute("input2_id").as_int();
 			printf("input 2 exists: %d\n", input2);
 		}
+		if (strcmp(node.attribute("input3_id").as_string(), "") != 0)
+		{
+			input3 = node.attribute("input3_id").as_int();
+			printf("input 3 exists: %d\n", input2);
+		}
+
 
 		gate = (Gate*)find_object_by_id(node.attribute("id").as_int());
 
@@ -847,6 +932,12 @@ MainWindow::load_file()
 		{
 			gate->set_input_gate2(find_object_by_id(input2));
 		}
+
+		if (input3 != -1)
+		{
+			gate->set_input_gate3(find_object_by_id(input3));
+		}
+
 	}
 
 	/* iterate again through all bdsp's in the xml file and set output objects if they exist */
@@ -964,6 +1055,12 @@ MainWindow::remove_object(Object &object)
 				gate.get_input_gate2()->remove_output_object_id(gate.get_id());
 				update_object_state(gate.get_input_gate2());
 			}
+			if (gate.get_input_gate3())
+			{
+				gate.get_input_gate3()->remove_output_object_id(gate.get_id());
+				update_object_state(gate.get_input_gate3());
+			}
+
 			break;
 		}
 		case Object::BINARYDISPLAY:
@@ -1145,12 +1242,31 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 					if (gate && gate->get_gate_type() != Gate::INPUT)
 					{
 						int input = -1;
-						if (ev->last_y-gate->get_y() <= gate->get_height()/2)
-							input = 1;
-						else
-							input = 2;
+						switch (gate->get_gate_type())
+						{
+							case Gate::NAND3:
+							{
+								/* case for gates with 3 inputs */
+								int relypos = ev->last_y-gate->get_y();
+								if (relypos <= 16) 		   { input = 1; }
+								if (relypos >16 && relypos <= 34)  { input = 2; }
+								if (relypos >34)  		   { input = 3; }
+
+								break;
+							}
+							default:
+							{
+								if (ev->last_y-gate->get_y() <= gate->get_height()/2)
+									input = 1;
+								else
+									input = 2;
+								break;
+							}
+						}
+
 						if (gate->get_gate_type() != Gate::NOT && gate->get_gate_type() != Gate::OUTPUT)
 						{
+							// FIXME: these should be objects, cannot explicitly cast to gates
 							printf("connecting gate %d with gate %d at input #%d\n", selected_object->get_id(), gate->get_id(), input);
 							if (input == 1)
 							{
@@ -1159,6 +1275,10 @@ MainWindow::on_left_mouse_up(FXObject*, FXSelector, void *ptr)
 							else if (input == 2)
 							{
 								gate->set_input_gate2((Gate*)selected_object);
+							}
+							else if (input == 3)
+							{
+								gate->set_input_gate3((Gate*)selected_object);
 							}
 						}
 						else
@@ -1348,6 +1468,11 @@ MainWindow::on_key_release(FXObject *sender, FXSelector sel, void *ptr)
 								gate->get_input_gate2()->remove_output_object_id(selected_object->get_id());
 								gate->set_input_gate2(nullptr);
 								break;
+							case 3:
+								gate->get_input_gate3()->remove_output_object_id(selected_object->get_id());
+								gate->set_input_gate3(nullptr);
+								break;
+
 							default: break;
 						}
 						break;
@@ -1476,6 +1601,16 @@ MainWindow::nand_button_press(FXObject *sender, FXSelector sel, void *ptr)
 	selected_gate_type = Gate::NAND;
 	return 1;
 }
+
+long
+MainWindow::nand3_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	selected_object = nullptr;
+	selected_object_type = Object::GATE;
+	selected_gate_type = Gate::NAND3;
+	return 1;
+}
+
 
 long
 MainWindow::or_button_press(FXObject *sender, FXSelector sel, void *ptr)
