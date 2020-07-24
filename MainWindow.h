@@ -53,6 +53,7 @@ class MainWindow : public FXMainWindow
 		enum {
 			ID_CANVAS       = FXMainWindow::ID_LAST,
 			ID_BUTTON_INPUT,
+			ID_BUTTON_PULSE,
 			ID_BUTTON_OUTPUT,
 			ID_BUTTON_AND,
 			ID_BUTTON_NAND,
@@ -80,6 +81,7 @@ class MainWindow : public FXMainWindow
 		long on_mouse_move(FXObject*,FXSelector,void* ptr);
 		/* toolbox */
 		long input_button_press(FXObject*,FXSelector,void* ptr);
+		long pulse_button_press(FXObject*,FXSelector,void* ptr);
 		long output_button_press(FXObject*,FXSelector,void* ptr);
 		long and_button_press(FXObject*,FXSelector,void* ptr);
 		long nand_button_press(FXObject*,FXSelector,void* ptr);
@@ -153,6 +155,7 @@ class MainWindow : public FXMainWindow
 		/* icons */
 		FXGIFIcon *INPUT_icon;
 		FXGIFIcon *OUTPUT_icon;
+		FXGIFIcon *PULSE_icon;
 		FXGIFIcon *AND_icon;
 		FXGIFIcon *NAND_icon;
 		FXGIFIcon *NAND3_icon;
@@ -165,6 +168,7 @@ class MainWindow : public FXMainWindow
 
 		/* buttons */
 		FXButton *INPUT_button;
+		FXButton *PULSE_button;
 		FXButton *OUTPUT_button;
 		FXButton *AND_button;
 		FXButton *NAND_button;
@@ -221,7 +225,7 @@ class Thread : public FXThread
 		{
 			while (1)
 			{
-				FXThread::sleep(70000000);
+				FXThread::sleep(40000000);
 				sig->signal();
 			};
 			return 0;

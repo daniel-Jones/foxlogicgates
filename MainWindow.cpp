@@ -30,6 +30,7 @@ FXDEFMAP(MainWindow) MainWindow_Map[]=
 	FXMAPFUNC(SEL_KEYRELEASE, 0, MainWindow::on_key_release),
 	/* toolbox */
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_INPUT, MainWindow::input_button_press),
+	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_PULSE, MainWindow::pulse_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_OUTPUT, MainWindow::output_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_AND, MainWindow::and_button_press),
 	FXMAPFUNC(SEL_COMMAND, MainWindow::ID_BUTTON_NAND, MainWindow::nand_button_press),
@@ -71,6 +72,7 @@ MainWindow::create()
 {
 	FXMainWindow::create();
 	INPUT_icon->create();
+	PULSE_icon->create();
 	OUTPUT_icon->create();
 	AND_icon->create();
 	NAND_icon->create();
@@ -94,6 +96,7 @@ MainWindow::create_ui()
 	/* icons */
 
 	INPUT_icon = new FXGIFIcon(app, INPUT_icon_data, IMAGE_KEEP);
+	PULSE_icon = new FXGIFIcon(app, PULSE_icon_data, IMAGE_KEEP);
 	OUTPUT_icon = new FXGIFIcon(app, OUTPUT_icon_data, IMAGE_KEEP);
 	AND_icon = new FXGIFIcon(app, AND_icon_data, IMAGE_KEEP);
 	NAND_icon = new FXGIFIcon(app, NAND_icon_data, IMAGE_KEEP);
@@ -112,6 +115,7 @@ MainWindow::create_ui()
 	new FXLabel(toolsFrame, "Toolbox", NULL, JUSTIFY_CENTER_X|LAYOUT_FILL_X);
 	new FXHorizontalSeparator(toolsFrame, SEPARATOR_RIDGE|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "", INPUT_icon, this, MainWindow::ID_BUTTON_INPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
+	new FXButton(toolsFrame, "", PULSE_icon, this, MainWindow::ID_BUTTON_PULSE, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "", OUTPUT_icon, this, MainWindow::ID_BUTTON_OUTPUT, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "AND", AND_icon, this, MainWindow::ID_BUTTON_AND, BUTTON_NORMAL|LAYOUT_FILL_X);
 	new FXButton(toolsFrame, "NAND", NAND_icon, this, MainWindow::ID_BUTTON_NAND, BUTTON_NORMAL|LAYOUT_FILL_X);
@@ -202,6 +206,20 @@ MainWindow::draw()
 						dc_image.drawIcon(INPUT_icon, gate1->get_x(), gate1->get_y());
 						break;
 					}
+
+					case Gate::PULSE:
+					{
+						if (gate1->get_output_state() == true)
+						{
+							/* input is switched on, indicate so */
+							dc_image.setForeground(FXRGB(255, 255, 0));
+							dc_image.fillRectangle(gate1->get_x(), gate1->get_y(), gate1->get_width(), gate1->get_height());
+							dc_image.setForeground(FXRGB(0,0,0));
+						}
+						dc_image.drawIcon(PULSE_icon, gate1->get_x(), gate1->get_y());
+						break;
+					}
+
 
 					case Gate::OUTPUT:
 					{
@@ -1402,7 +1420,7 @@ MainWindow::on_right_mouse_down(FXObject*, FXSelector, void *ptr)
 			case Object::GATE:
 			{
 				Gate *gate = (Gate*)object;
-				if (gate->get_gate_type() == Gate::INPUT)
+				if (gate->get_gate_type() == Gate::INPUT || gate->get_gate_type() == Gate::PULSE)
 				{
 					/* toggle state */
 					gate->set_state(!gate->get_output_state());
@@ -1574,6 +1592,16 @@ MainWindow::input_button_press(FXObject *sender, FXSelector sel, void *ptr)
 	selected_gate_type = Gate::INPUT;
 	return 1;
 }
+
+long
+MainWindow::pulse_button_press(FXObject *sender, FXSelector sel, void *ptr)
+{
+	selected_object = nullptr;
+	selected_object_type = Object::GATE;
+	selected_gate_type = Gate::PULSE;
+	return 1;
+}
+
 
 long
 MainWindow::output_button_press(FXObject *sender, FXSelector sel, void *ptr)

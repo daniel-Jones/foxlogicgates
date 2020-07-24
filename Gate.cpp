@@ -73,6 +73,13 @@ void Gate::update_state()
 			break;
 		}
 
+		case PULSE:
+		{
+			if (output_state)
+				output_state = false;
+			break;
+		}
+
 		case OUTPUT:
 		{
 			if (input_gate1 && input_gate1->get_output_state() == true)

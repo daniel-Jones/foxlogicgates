@@ -36,6 +36,7 @@ class Gate : public Object
 			XOR,
 			XNOR,
 			NAND3,
+			PULSE,
 		};
 
 		Gate(GATE_TYPE type = INPUT, int x = 0, int y = 0, int width = 70, int height = 50, int id = -1);
